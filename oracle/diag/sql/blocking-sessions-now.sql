@@ -22,16 +22,19 @@ set lines 120
 undef blocking_session_id
 col wait_event format a30
 
-select 	sql_id, 
-   	substr(event,1,30) wait_event, 
-	blocking_session blocking_session_id, 
-	count(*) 
-from v$session 
---where blocking_session is not null
-group by sql_id, 
-	substr(event,1,30), 
-	blocking_session 
-order by count(*) desc ;
+select * from (
+	select 	sql_id, 
+   		substr(event,1,30) wait_event, 
+		blocking_session blocking_session_id, 
+		count(*) 
+	from v$session 
+	where blocking_session is not null
+	group by sql_id, 
+		substr(event,1,30), 
+		blocking_session 
+	order by count(*) desc 
+     ) 
+where rownum <=50 ;
 
 ttitle left 'Detail on a Specific Blocking Session ID' skip left -
 ttitle left '===========================================================' 
