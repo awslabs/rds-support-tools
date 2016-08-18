@@ -1,4 +1,4 @@
-mysql.README 
+mariadb.README 
  
 # Copyright 2016 Amazon.com, Inc. or its affiliates. 
 # All Rights Reserved.
@@ -15,7 +15,7 @@ mysql.README
 # and limitations under the License.
  
 ##############################################################################
-MYSQL SCRIPTS 
+MARIADB SCRIPTS  -  See also rds-support-tools/mysql/mysql.README
 ##############################################################################
 
 
@@ -23,19 +23,19 @@ script-name                          :   Description
 
 
 #####################################
-rds-support-tools/mysql/diag/sql
+rds-support-tools/mariadb/diag/sql
 #####################################
 
 
 
 #####################################
-rds-support-tools/mysql/diag/shell
+rds-support-tools/mariadb/diag/shell
 #####################################
 
 
 
 
 #####################################
-rds-support-tools/mysql/diag/proc
+rds-support-tools/mariadb/diag/proc
 #####################################
 
