@@ -1,4 +1,4 @@
-mysql.README 
+oracle-ee.README 
  
 # Copyright 2016 Amazon.com, Inc. or its affiliates. 
 # All Rights Reserved.
@@ -15,7 +15,7 @@ mysql.README
 # and limitations under the License.
  
 ##############################################################################
-MYSQL SCRIPTS 
+ORACLE-EE SCRIPTS  -  See also rds-support-tools/oracle/oracle.README
 ##############################################################################
 
 
@@ -23,19 +23,20 @@ script-name                          :   Description
 
 
 #####################################
-rds-support-tools/mysql/diag/sql
-#####################################
-
-
-
-#####################################
-rds-support-tools/mysql/diag/shell
+rds-support-tools/oracle-ee/diag/sql
 #####################################
 
 
 
 
 #####################################
-rds-support-tools/mysql/diag/proc
+rds-support-tools/oracle-ee/diag/shell
+#####################################
+
+
+
+
+#####################################
+rds-support-tools/oracle-ee/diag/proc
 #####################################
 
