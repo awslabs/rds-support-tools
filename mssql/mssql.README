@@ -1,4 +1,4 @@
-oracle.README 
+mssql.README 
  
 # Copyright 2016 Amazon.com, Inc. or its affiliates. 
 # All Rights Reserved.
@@ -23,26 +23,19 @@ script-name                          :   Description
 
 
 #####################################
-rds-support-tools/oracle/diag/sql
+rds-support-tools/mssql/diag/sql
 #####################################
-blocking-sessions-now.sql           : 	Counts number of current waiters in v$session who have blockers.
-					2nd query outputs current detail of a given blocker.
-
-blocking-sessions-last-1-hour.sql   : 	Counts number of recent waiters in v$active_session_history who have had blockers.
-					2nd query outputs recent detail of a given blocker. 
-
-session-wait-summary.sql            : 	Counts the number of sessions waiting on each Oracle wait event.
 
 
 
 #####################################
-rds-support-tools/oracle/diag/shell
+rds-support-tools/mssql/diag/shell
 #####################################
 
 
 
 
 #####################################
-rds-support-tools/oracle/diag/proc
+rds-support-tools/mssql/diag/proc
 #####################################
 
