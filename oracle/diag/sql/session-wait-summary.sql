@@ -9,11 +9,15 @@ Copyright [first edit year]-[latest edit year] Amazon.com, Inc. or its affiliate
 */ 
 
 
+
 COL event FORM a40
 COL seq# FORM 999999
 SET WRAP OFF
 SET LINESIZE 110
 SET PAGES 80
+
+ttitle left 'Count of Sessions by Wait Event' skip left -
+ttitle left '================================================================='
 
 SELECT
   event,
@@ -22,4 +26,6 @@ FROM v$session_wait
 GROUP BY event
 ORDER BY count(*) DESC
 ; 
+ttitle off
+
 
