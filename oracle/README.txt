@@ -21,7 +21,13 @@ ORACLE SCRIPTS
 #####################################
 rds-support-tools/oracle/diag/sql
 #####################################
-* session-wait-summary.sql : 		Counts the number of sessions waiting on each Oracle wait event
+* blocking-sessions-now.sql : 		Counts number of current waiters in v$session who have blockers.
+					2nd query outputs current detail of a given blocker.
+
+* blocking-sessions-last-1-hour.sql : 	Counts number of recent waiters in v$active_session_history who have had blockers.
+					2nd query outputs recent detail of a given blocker. 
+
+* session-wait-summary.sql : 		Counts the number of sessions waiting on each Oracle wait event.
 
 
 
