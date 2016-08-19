@@ -1,4 +1,4 @@
-mssql.README 
+mssql-ee.README 
  
 # Copyright 2016 Amazon.com, Inc. or its affiliates. 
 # All Rights Reserved.
@@ -15,27 +15,27 @@ mssql.README
 # and limitations under the License.
  
 ##############################################################################
-MSSQL SCRIPTS 
+MSSQL-EE SCRIPTS         See also rds-support-tools/mssql/mssql.README 
 ##############################################################################
 
 
 script-name                          :  Description 
-					Tested on MSSQL-SE <version>, opt: MSSQL-EE <version>	
+					Tested on mssql-ee <version>
 
 #####################################
-rds-support-tools/mssql/diag/sql
-#####################################
-
-
-
-#####################################
-rds-support-tools/mssql/diag/shell
+rds-support-tools/mssql-ee/diag/sql
 #####################################
 
 
 
+#####################################
+rds-support-tools/mssql-ee/diag/shell
+#####################################
+
+
+
 
 #####################################
-rds-support-tools/mssql/diag/proc
+rds-support-tools/mssql-ee/diag/proc
 #####################################
 
