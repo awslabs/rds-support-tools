@@ -19,8 +19,8 @@ AURORA SCRIPTS     -   See also rds-support-tools/mysql/mysql.README
 ##############################################################################
 
 
-script-name                          :   Description 
-
+script-name                          :  Description 
+					Tested on Aurora <version>
 
 #####################################
 rds-support-tools/aurora/diag/sql

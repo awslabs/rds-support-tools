@@ -19,8 +19,8 @@ MARIADB SCRIPTS  -  See also rds-support-tools/mysql/mysql.README
 ##############################################################################
 
 
-script-name                          :   Description 
-
+script-name                          :  Description 
+					Tested on MariaDB <version>	
 
 #####################################
 rds-support-tools/mariadb/diag/sql

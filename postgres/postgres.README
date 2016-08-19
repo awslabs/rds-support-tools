@@ -19,8 +19,8 @@ POSTGRES SCRIPTS
 ##############################################################################
 
 
-script-name                          :   Description 
-
+script-name                          :  Description 
+					Tested on PostgreSQL <version>
 
 #####################################
 rds-support-tools/postgres/diag/sql

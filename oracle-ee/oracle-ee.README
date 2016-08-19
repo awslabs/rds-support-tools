@@ -19,8 +19,8 @@ ORACLE-EE SCRIPTS  -  See also rds-support-tools/oracle/oracle.README
 ##############################################################################
 
 
-script-name                          :   Description 
-
+script-name                          :  Description 
+					Tested on Oracle-EE <version>
 
 #####################################
 rds-support-tools/oracle-ee/diag/sql
