@@ -19,8 +19,8 @@ MSSQL SCRIPTS
 ##############################################################################
 
 
-script-name                          :   Description 
-
+script-name                          :  Description 
+					Tested on MSSQL <version> 	
 
 #####################################
 rds-support-tools/mssql/diag/sql
