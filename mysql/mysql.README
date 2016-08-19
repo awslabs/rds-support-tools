@@ -20,7 +20,7 @@ MYSQL SCRIPTS
 
 
 script-name                          :   Description 
-					 Tested on <Mysql or MariaDB or Aurora> <version>
+					 Tested on Mysql <version>,  opt: <MariaDB or Aurora> <version>
 
 #####################################
 rds-support-tools/mysql/diag/sql
