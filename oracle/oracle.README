@@ -40,8 +40,8 @@ session-wait-summary.sql            : 	Counts the number of sessions waiting on 
 #####################################
 rds-support-tools/oracle/diag/shell
 #####################################
-
-
+get-alert-status.cli 		   :   Uses aws cli to extract Oracle alert log for a given db instance id and region 
+					
 
 
 #####################################
