@@ -33,6 +33,15 @@ if [[ ${3:-0} = 0 ]] ;  then
    exit 1
 fi
 
+typeset -i ndelete
+typeset -i ninsert
+typeset -i nupdate
+typeset -i nwrite 
+typeset -i nmerge 
+typeset -i nalter
+typeset -i ntruncate
+typeset -i ndrop 
+
 
 tns_connect_list=$1 
 oracle_name=$2 
@@ -48,6 +57,26 @@ echo Enter $oracle_name password:***************
 stty -echo 2>/dev/null
 read -s oracle_pwd
 stty echo 2>/dev/null
+
+
+ndelete=`grep -i delete $sql_script | wc -l`
+ninsert=`grep -i insert $sql_script | wc -l`
+nupdate=`grep -i update $sql_script | wc -l`
+nwrite=`grep -i write $sql_script | wc -l`
+nmerge=`grep -i merge $sql_script | wc -l`
+nalter=`grep -i alter $sql_script | wc -l`
+ntruncate=`grep -i truncate $sql_script | wc -l`
+ndrop=`grep -i drop $sql_script | wc -l`
+
+echo 
+echo 
+if [[ $ndelete -ne 0 || $ninsert -ne 0 || $nupdate -ne 0 || $nwrite -ne 0 || $nmerge -ne 0 || $nalter -ne 0 || $ntruncate -ne 0 || $ndrop -ne 0 ]] ; then 
+	echo 'Found one of (DELETE, INSERT, UPDATE, WRITE, MERGE, ALTER, TRUNCATE, DROP) in' $sql_script
+	echo Aborting 
+	exit 1 
+fi
+
+ 
 
 
 for constr in `cat ${tns_connect_list} | grep -v '#'` ; do 
