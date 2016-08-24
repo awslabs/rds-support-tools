@@ -80,7 +80,6 @@ fi
 
 
 for constr in `cat ${tns_connect_list} | grep -v '#'` ; do 
-	echo >> /tmp/all-dbout
 	echo $constr: 
 	dbout=`sqlplus -S /nolog  << EOF
         	connect ${oracle_name}/${oracle_pwd}@${constr}
