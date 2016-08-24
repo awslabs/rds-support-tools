@@ -31,7 +31,7 @@ rds-support-tools/mysql/diag/sql
 #####################################
 rds-support-tools/mysql/diag/shell 
 #####################################
-my.cnf				    :   Sample my.cnf file to keep password off commandline
+my.cnf				    :   Sample .my.cnf file to keep password off commandline
 					Ref http://dev.mysql.com/doc/refman/5.7/en/option-files.html
 					Tested om Mysql 5.7
 
