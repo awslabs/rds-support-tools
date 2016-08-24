@@ -13,6 +13,14 @@ oracle.README
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
 # either express or implied. See the License for the specific language governing permissions 
 # and limitations under the License.
+
+
+
+
+ cp tns-connect-list.sample rds-support-tools/oracle/diag/shell/
+(python34)[ec2-user@ip-10-0-4-22 dholmer]$ cp exec-sql-driver.sh rds-support-tools/oracle/diag/shell/
+(python34)[ec2-user@ip-10-0-4-22 dholmer]$ cp hello-world.sql rds-support-tools/oracle/diag/sql/
+
  
 ##############################################################################
 ORACLE SCRIPTS 
@@ -33,6 +41,9 @@ blocking-sessions-last-1-hour.sql   : 	Counts number of recent waiters in v$acti
 					2nd query outputs recent detail of a given blocker. 
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
+hello-world.sql 		    :   Selects "Hello World!"  from dual. Can be used for testing. 
+					Tested on Oracle-SE2 12.1 
+
 session-wait-summary.sql            : 	Counts the number of sessions waiting on each Oracle wait event.
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
@@ -40,9 +51,17 @@ session-wait-summary.sql            : 	Counts the number of sessions waiting on 
 #####################################
 rds-support-tools/oracle/diag/shell
 #####################################
-get-alert-status.cli 		   :   Uses aws cli to extract Oracle alert log for a given db instance id and region 
-					
+get-alert-status.cli 		   :   	Uses aws cli to extract Oracle alert log for a given db instance id and region 
+				   		
 
+tns-connect-list.sample		   :  	Sample tns connections list file. Can contain both tns aliases and raw connect strings
+					A similar file can be used with sql-driver.sh 					
+
+oracle-sql-driver.sh 		   : 	Run as oracle-sql-driver.sh <tns connections list file> <oracle dba user> <sql script> 
+					Prompts for <oracle dba user> password, then iterates over tns connection list, 
+					runnning <sql script> in each database. Same oracle dba user and password must 
+					exist in each database. 
+					Tested on Ec2 Amazon linux, Bash shell 
 
 #####################################
 rds-support-tools/oracle/diag/proc
