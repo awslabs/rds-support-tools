@@ -64,7 +64,7 @@ ninsert=`grep -i insert $sql_script | wc -l`
 nupdate=`grep -i update $sql_script | wc -l`
 nwrite=`grep -i write $sql_script | wc -l`
 nmerge=`grep -i merge $sql_script | wc -l`
-nalter=`grep -i alter $sql_script | wc -l`
+nalter=`grep -i alter $sql_script | grep -iv 'alter session' | wc -l`
 ntruncate=`grep -i truncate $sql_script | wc -l`
 ndrop=`grep -i drop $sql_script | wc -l`
 
