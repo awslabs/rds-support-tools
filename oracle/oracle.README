@@ -42,7 +42,12 @@ blocking-sessions-last-1-hour.sql   : 	Counts number of recent waiters in v$acti
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
 hello-world.sql 		    :   Selects "Hello World!"  from dual. Can be used for testing. 
-					Tested on Oracle-SE2 12.1 
+					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
+
+recommend-redolog-size-count.sql    :   Checks whether redologs are of adequate size and number for a heavy workload
+                                        that has been running for at least 20 minutes.  Makes recommendations.
+                                        Tested on Oracle-SE2 12.1, Oracle-EE 12.1
+
 
 session-wait-summary.sql            : 	Counts the number of sessions waiting on each Oracle wait event.
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
@@ -55,7 +60,7 @@ get-alert-status.cli 		   :   	Uses aws cli to extract Oracle alert log for a gi
 				   		
 
 tns-connect-list.sample		   :  	Sample tns connections list file. Can contain both tns aliases and raw connect strings
-					A similar file can be used with sql-driver.sh 					
+					A similar file can be used with oracle-sql-driver.sh 					
 
 oracle-sql-driver.sh 		   : 	Run as oracle-sql-driver.sh <tns connections list file> <oracle dba user> <sql script> 
 					Prompts for <oracle dba user> password, then iterates over tns connection list, 
