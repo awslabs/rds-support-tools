@@ -14,12 +14,47 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
-DB_INSTANCE=$1 
-REGION=$2 
 
-alert_name="$(aws rds describe-db-log-files --db-instance-identifier $DB_INSTANCE --region $REGION  | grep alert | head -1 | cut -d '"' -f4 )"
-echo $alert_name
+
+if [[ ${1:-0} = 0 ]] ;  then
+   clear 
+   echo 
+   echo 
+   echo "Usage:  get-alert-log.cli <db instance iddentifier> <opt: region>"
+   echo 
+   echo 
+   exit
+
+fi
+db_instance=$1 
+
+if [[ ${2:-0} = 0 ]] ;  then
+  region=`aws configure get region`
+  if [ -z "$region" ] ; then 
+        clear
+	echo 
+	echo 
+	echo Region is not specified on command line and default is not set
+    	echo
+	echo 
+	exit 
+  fi 
+else
+  region=$2
+fi 
+alert_name=`aws rds describe-db-log-files --db-instance-identifier $db_instance --region $region  | grep alert | head -1 | cut -d '"' -f4`
+
+echo 
+echo 
+echo 
+echo Db instance identifier is: $db_instance
+echo Region is $region
+echo Alert log is $alert_name
+echo 
+echo 
+sleep 3 
+
 
 aws rds download-db-log-file-portion \
---db-instance-identifier $DB_INSTANCE  --region $REGION \
+--db-instance-identifier $db_instance  --region $region \
 --log-file-name $alert_name --output text
