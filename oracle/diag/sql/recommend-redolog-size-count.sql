@@ -29,7 +29,7 @@ select * from
     	with mpl as (select (20/greatest(count(*),1)) min_per_log from v$archived_log where first_time >=  sysdate-20/1440),
    	ls as ( select trunc(min(bytes/1024/1024)) log_size from v$log )
     	select (case when min_per_log < 5 then 'Increase Redolog Size to '  
-    	|| least(ceil(5/min_per_log),4)*log_size || 'M.'  else 'Redolog Size Ok.' end) redolog_size_recommendation
+    	|| ceil(5/greatest(min_per_log,1))*log_size || 'M.'  else 'Redolog Size Ok.' end) redolog_size_recommendation
     	from mpl, ls
     ) rsr, 
     (  
