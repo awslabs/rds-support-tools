@@ -15,19 +15,13 @@
  * and limitations under the License.
 */
 
-rem sql-text-for-sql_id.sql
+rem explain-sql-whr-sql_id.sql 
 
-clear breaks
-ttitle off 
 undef sql_id
-set long 4000
-set linesize 4000
-set wrap on 
-set head off
-select sql_text 
-from v$sqltext 
-where sql_id='&sql_id'
-order by sql_id, piece;
+ttitle off
+clear breaks 
+set feed on 
 
 
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR('&sql_id',0)); 
 

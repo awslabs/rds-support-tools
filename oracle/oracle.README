@@ -42,10 +42,10 @@ blocking-sessions-last-1-hour.sql   : 	Counts number of recent waiters in v$acti
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
 expensive-sql.sql 		    :   Outputs 20 most expensive sql statements in order of largest buffer_gets/execution 
-					User can comment out this order by clause and uncomment another for a different view 
+					User can comment out this "order by" clause and uncomment another for a different view 
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
-explain-sql-for-sql_id.sql	    :   Outputs sql plan for a prompted sql_id 
+explain-sql-whr-sql_id.sql	    :   Outputs sql plan for a prompted sql_id 
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
 hello-world.sql 		    :   Selects "Hello World!"  from dual. Can be used for testing. 
@@ -55,20 +55,21 @@ recommend-redolog-size-count.sql    :   Checks whether redologs are of adequate 
                                         that has been running for at least 20 minutes.  Makes recommendations.
                                         Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
-sessions-for-wait_event.sql 	    :   Outputs session detail for sessions that have waited longest on a prompted wait event 
+sessions-whr-wait_event.sql 	    :   Outputs session detail for sessions that have waited longest on a prompted wait event 
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
 session-wait-summary.sql            : 	Counts the number of sessions waiting on each Oracle wait event.
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
-sql-text-for-sql_id.sql	    	    :   Outputs sql text for a prompted sql_id
+sql-text-whr-sql_id.sql	    	    :   Outputs sql text for a prompted sql_id
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
 
 #####################################
 rds-support-tools/oracle/diag/shell
 #####################################
-get-alert-status.cli 		   :   	Uses aws cli to extract Oracle alert log for a given db instance id and region 
+get-alert-status.cli 		   :   	Bash script uses aws cli to extract Oracle alert log for a given db instance id and region 
+					Tested on aws-cli/1.10.30 
 				   		
 
 tns-connect-list.sample		   :  	Sample tns connections list file. Can contain both tns aliases and raw connect strings
@@ -79,6 +80,11 @@ oracle-sql-driver.sh 		   : 	Run as oracle-sql-driver.sh <tns connections list f
 					runnning <sql script> in each database. Same oracle dba user and password must 
 					exist in each database. 
 					Tested on Ec2 Amazon linux, Bash shell 
+
+sqlplus.cli 			   :    Bash script accepts db-instance-identifier, oracle username and optional region as commandline parameters
+					Calls awscli to extract hostname, port and database name 
+					Constructs a tns connect string and connects to database in sqlplus 
+					Tested on aws-cli/1.10.30					
 
 #####################################
 rds-support-tools/oracle/diag/proc
