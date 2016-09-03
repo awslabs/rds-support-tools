@@ -35,6 +35,10 @@ pgpass				    :   Sample pgpass file to keep password off commandline
 					Ref: https://www.postgresql.org/docs/current/static/libpq-pgpass.html
 					Tested on psql 9.2
 
+psql.cli			    :   Bash script accepts db-instance-identifier, postgres username and optional region as commandline parameters
+                                        Calls awscli to extract hostname, port and database name and connects to database in psql
+					Assumes password is in $HOME/.pgpass See example file  
+                                        Tested on aws-cli/1.10.30
 
 #####################################
 rds-support-tools/postgres/diag/proc

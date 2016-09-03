@@ -36,6 +36,7 @@ select * from (
      ) 
 where rownum <=50 ;
 
+ttitle off 
 ttitle left 'Detail on a Specific Blocking Session ID' skip left -
 ttitle left '===========================================================' 
 col username format a10
