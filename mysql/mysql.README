@@ -35,6 +35,11 @@ my.cnf				    :   Sample .my.cnf file to keep password off commandline
 					Ref http://dev.mysql.com/doc/refman/5.7/en/option-files.html
 					Tested om Mysql 5.7
 
+mysql.cli                           :   Bash script accepts db-instance-identifier, mysql username and optional region as commandline parameters
+                                        Calls awscli to extract hostname, port and database name and connects to database in mysql
+                                        Assumes password is in $HOME/.my.cnf See example file
+                                        Tested on aws-cli/1.10.30
+
 
 #####################################
 rds-support-tools/mysql/diag/proc

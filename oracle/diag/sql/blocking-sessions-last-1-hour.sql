@@ -37,6 +37,7 @@ select * from (
 	order by count(*) desc 
 ) where rownum <= 50; 
 
+ttitle off 
 ttitle left 'Detail History on a Specific Blocking Session ID' skip left -
 ttitle left '================================================================='
 set lines 125

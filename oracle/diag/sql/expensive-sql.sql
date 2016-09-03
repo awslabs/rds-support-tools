@@ -24,7 +24,7 @@ set pages 80
 set feed on 
 set head on 
 set wrap on 
-column sqltext form a2000 head "SqlText"
+column sqltext form a1000 head "SqlText"
 column executions form 999,999,999,999 head "Executions"
 column BufsPerExec FORMAT 999,999,999,999 head "BufsPerExec"
 column DiskRdsPerExec FORMAT 999,999,999,999 head "DiskRdsPerExec"
@@ -46,8 +46,7 @@ select * from
 	, cpu_time/executions CpuPerExec 
 	, elapsed_time/executions ElapsedTimePerExec
 	from v$sqlarea 
-	where executions > 1
-	and buffer_gets/executions > 1000
+	where executions > 0
 	order by buffer_gets/executions desc 
 	--order by elapsed_time/executions desc
 	--order by cpu_time/executions desc
