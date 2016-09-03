@@ -15,7 +15,7 @@
  * and limitations under the License.
 */
 
-rem sessions-for-wait_event.sql
+rem sessions-whr-wait_event.sql
 
 set wrap on
 set pages 80 
