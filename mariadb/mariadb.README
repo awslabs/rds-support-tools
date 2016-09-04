@@ -32,7 +32,9 @@ rds-support-tools/mariadb/diag/sql
 rds-support-tools/mariadb/diag/shell
 #####################################
 
-
+list-mariadb-inst-ids.cli          :   Bash script accepts optional region on commandline and calls awscli 
+				       Outputs list of db-instance-identifiers running mariadb 
+                                       Tested on aws-cli/1.10.30
 
 
 #####################################

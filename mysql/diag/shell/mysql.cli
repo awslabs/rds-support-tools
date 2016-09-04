@@ -13,14 +13,14 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 #
-# mysql.cli 
+# mysql.cli   Ref rds-support-tools/mysql/mysql.README
 #
 
 if [[ ${2:-0} = 0 ]] ;  then
    clear
    echo
    echo
-   echo "Usage:  mysql.cli <db instance iddentifier> <mysql username> <opt: region>"
+   echo "Usage:  mysql.cli <db instance identifier> <mysql username> <opt: region>"
    echo
    echo
    exit

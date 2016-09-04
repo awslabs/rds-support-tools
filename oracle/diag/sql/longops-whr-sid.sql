@@ -1,4 +1,5 @@
 
+
 /*
  *  Copyright 2016 Amazon.com, Inc. or its affiliates.
  *  All Rights Reserved.
@@ -15,21 +16,29 @@
  * and limitations under the License.
 */
 
-rem sql-text-whr-sql_id.sql   Ref rds-support-tools/oracle/oracle.README 
+rem  longops-whr-sid.sql Ref rds-support-tools/oracle/oracle.README
 
-clear breaks
-ttitle off 
-undef sql_id
-set long 4000
-set linesize 4000
-set wrap on 
-set head off
-select sql_text 
-from v$sqltext 
-where sql_id='&sql_id'
-order by sql_id, piece;
+undef sid
 
-set head on 
-set linesize 120 
+set head on
+set lines 150 
+column opname format a30 
+column target format a30 
+column hrs_remain format 999.99 
+column hrs_elapsed format 999.99 
+set wrap off 
+
+select * from (
+   	select sql_id
+	, opname 
+   	, substr(target,1,30) target
+   	, start_time
+   	, elapsed_seconds/(60*60) hrs_elapsed
+   	, time_remaining/(60*60) hrs_remain
+	from v$session_longops
+	where sid=&sid
+	order by start_time desc
+) where rownum < 50 
+;
 
 

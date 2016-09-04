@@ -15,7 +15,7 @@
  * and limitations under the License.
 */
 
-rem expensive-sql.sql 
+rem expensive-sql.sql     Ref rds-support-tools/oracle/oracle.README
 
 clear breaks
 ttitle off 
@@ -55,7 +55,7 @@ select * from
 	--order by parse_calls/executions desc
 	--order by executions desc
 )
-where rownum <= 20
+where rownum <= 50
 ; 
 
 

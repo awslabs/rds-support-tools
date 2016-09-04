@@ -15,12 +15,13 @@
  * and limitations under the License.
 */
 
-rem Run this script after seeing heavy workload for at least 20 minutes. 
+rem recommend-redolog-size-count.sql    Ref rds-support-tools/oracle/oracle.README
 
 clear breaks 
 ttitle off 
 set lines 80
 set feed off 
+set head on 
 col redolog_size_recommendation form a35 
 col redolog_count_recommendation form a35 
 

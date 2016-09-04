@@ -13,7 +13,8 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
-
+#
+# oracle-sql-driver.sh    Ref rds-support-tools/oracle/oracle.README
 
 
 export SQLPATH=
@@ -25,7 +26,7 @@ if [[ ${3:-0} = 0 ]] ;  then
    echo
    echo
    echo
-   echo Usage: oracle-sql-driver.sh tns_list_file oracle_user sql_script 
+   echo "Usage: oracle-sql-driver.sh <tns_list_file> <oracle_username> <sql_script>"
    echo
    echo Example:
    echo oracle-sql-driver.sh tns-connect-list.sample master_user hello-world.sql 
