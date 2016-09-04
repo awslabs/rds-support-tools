@@ -15,7 +15,7 @@
  * and limitations under the License.
 */
 
-rem explain-sql-whr-sql_id.sql 
+rem explain-sql-whr-sql_id.sql    Ref rds-support-tools/oracle/oracle.README 
 
 undef sql_id
 ttitle off

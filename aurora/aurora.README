@@ -33,6 +33,9 @@ rds-support-tools/aurora/diag/shell
 #####################################
 
 
+list-aurora-inst-ids.cli          :   Bash script accepts optional region on commandline, calls awscli 
+				      Outputs db-instance-idenfifiers running aurora
+                                      Tested on aws-cli/1.10.30
 
 
 #####################################

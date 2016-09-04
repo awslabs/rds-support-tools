@@ -27,13 +27,21 @@ rds-support-tools/oracle-ee/diag/sql
 #####################################
 
 
+blocking-sessions-last-1-hour.sql    :	Counts number of recent waiters in v$active_session_history who have had blockers
+                                        Tested Oracle-EE 12.1
+
+
+session-sql-waits-last-1-hour.sql    :  Counts number of sessions in v$active_session_history who were 
+					recently running sql with same wait event
+                                        Tested Oracle-EE 12.1 
 
 
 #####################################
 rds-support-tools/oracle-ee/diag/shell
 #####################################
 
-
+list-oracle-ee-inst-ids.cli        :    Bash script calls awscli to list oracle-ee db-instance-ids in a region
+                                        Tested on aws-cli/1.10.30
 
 
 #####################################

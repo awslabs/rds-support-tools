@@ -15,7 +15,7 @@
  * and limitations under the License.
 */
 
-rem sessions-whr-wait_event.sql Ref rds-support-tools/oracle/oracle.README 
+rem sessions-whr-sql_id.sql Ref rds-support-tools/oracle/oracle.README 
 
 set wrap on
 set pages 80 
@@ -45,10 +45,10 @@ select * from
 	, substr(event, 1,30) wait_event 
   	, p1
   	, p2
-  	, seconds_in_wait
+  	, logon_time
 	from v$session 
-	where lower(event) like lower('%&wait_event%')
+	where sql_id='&sql_id'
 	order by seconds_in_wait desc 
-) where rownum < 50 
+) where rownum < 50   
 ;
 

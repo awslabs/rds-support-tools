@@ -13,7 +13,7 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 #
-# psql.cli 
+# psql.cli     Ref rds-support-tools/postgres/postgres.README
 #
 
 if [[ ${2:-0} = 0 ]] ;  then

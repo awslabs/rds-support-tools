@@ -31,6 +31,10 @@ rds-support-tools/postgres/diag/sql
 #####################################
 rds-support-tools/postgres/diag/shell
 #####################################
+
+list-postgres-inst-ids.cli 	    :   Bash script calls awscli to list postgres db-instance-ids in a region
+                                        Tested on aws-cli/1.10.30
+
 pgpass				    :   Sample pgpass file to keep password off commandline 
 					Ref: https://www.postgresql.org/docs/current/static/libpq-pgpass.html
 					Tested on psql 9.2

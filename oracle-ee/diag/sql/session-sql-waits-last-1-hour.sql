@@ -15,24 +15,28 @@
  * and limitations under the License.
 */
 
-rem session-wait-summary.sql Ref rds-support-tools/oracle/oracle.README 
+rem session-sql-waits-last-1-hour.sql      Ref rds-support-tools/oracle/oracle.README 
 
-COL event FORM a40 HEAD "WAIT_EVENT"
-COL seq# FORM 999999
-SET WRAP OFF
-SET LINESIZE 110
-SET PAGES 80
+clear breaks 
+set head on 
+col event form a40 
+set lines 120 
+set pages 80 
 
-ttitle left 'Count of Sessions by Wait Event' skip left -
+ttitle left 'Count of Recent Sessions by Sql ID and Wait Event' skip left -
 ttitle left '================================================================='
 
-SELECT
-  event,
-  count(*)
-FROM v$session_wait
-GROUP BY event
-ORDER BY count(*) DESC
+select * from (
+   select
+  	sql_id,
+	event, 
+  	count(*)
+   from v$active_session_history  
+   where sample_time > sysdate-1/24
+   group by sql_id, event
+   order by count(*) desc 
+) where rownum < 50 
 ; 
-ttitle off
 
+ttitle off
 

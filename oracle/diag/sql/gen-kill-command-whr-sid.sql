@@ -14,27 +14,19 @@
  * either express or implied. See the License for the specific language governing permissions 
  * and limitations under the License.
 */
+rem kill-command-whr-sid.sql    Ref rds-support-tools/oracle/oracle.README 
 
-rem  blocking-sessions-now.sql Ref rds-support-tools/oracle/oracle.README
 
-ttitle left 'Summary of SQL_IDs and Wait Events With Blocking Sessions' skip left -
+set head off 
+set lines 120 
+ttitle left 'Cut and paste command to kill session' skip left -
 ttitle left '==========================================================='
-clear breaks
-set lines 120
-col wait_event format a30
 
-select * from (
-	select 	sql_id, 
-   		substr(event,1,30) wait_event, 
-		blocking_session blocking_session_id, 
-		count(*) 
-	from v$session 
-	where blocking_session is not null
-	group by sql_id, 
-		substr(event,1,30), 
-		blocking_session 
-	order by count(*) desc 
-     ) 
-where rownum <=50 ;
+select 'exec rdsadmin.rdsadmin_util.kill(' || sid || ',' || serial# || ');' 
+from v$session 
+where sid = &sid
+and type <> 'BACKGROUND'
+;
 
+set head on 
 ttitle off 
