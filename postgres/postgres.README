@@ -42,6 +42,7 @@ pgpass				    :   Sample pgpass file to keep password off commandline
 psql.cli			    :   Bash script accepts db-instance-identifier, postgres username and optional region as commandline parameters
                                         Calls awscli to extract hostname, port and database name and connects to database in psql
 					Assumes password is in $HOME/.pgpass See example file  
+					Tip: Run list-postgres-inst-ids.cli to generate db-instance-identifier list. 
                                         Tested on aws-cli/1.10.30
 
 #####################################

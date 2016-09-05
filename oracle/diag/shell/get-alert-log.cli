@@ -20,7 +20,7 @@ if [[ ${1:-0} = 0 ]] ;  then
    clear 
    echo 
    echo 
-   echo "Usage:  get-alert-log.cli <db instance iddentifier> <opt: region>"
+   echo "Usage:  get-alert-log.cli <db instance identifier> <opt: region>"
    echo 
    echo 
    exit

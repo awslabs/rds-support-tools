@@ -33,7 +33,7 @@ script-name                          :  Description
 #####################################
 rds-support-tools/oracle/diag/sql
 #####################################
-blocking-sessions-now.sql           : 	Counts number of current waiters in v$session who have blockers.
+blocking-sessions.sql               : 	Counts number of current waiters in v$session who have blockers
 					Tested Oracle-SE2 12.1, Oracle-EE 12.1
 
 expensive-sql.sql 		    :   Outputs 50 most expensive sql statements in order of largest buffer_gets/execution 
@@ -57,16 +57,19 @@ recommend-redolog-size-count.sql    :   Checks whether redologs are of adequate 
                                         that has been running for at least 20 minutes.  Makes recommendations.
                                         Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
-session-sql-waits-now.sql	    :   Counts number of sessions currently running sql with same wait event 
+session-sql-waits.sql	    	    :   Counts number of sessions currently running sql with same wait event 
+					Tested Oracle-SE2 12.1, Oracle-EE 12.1 
+
+sessions-whr-username.sql 	    :   Outputs session detail for sessions logged in as a prompted username
 					Tested Oracle-SE2 12.1, Oracle-EE 12.1 
 					
-sessions-whr-sql_id.sql 	    :   Outputs session detail for sessions 
+sessions-whr-sql_id.sql 	    :   Outputs session detail for sessions running prompted sql_id
                                         Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
-sessions-whr-wait_event.sql 	    :   Outputs session detail for sessions that have waited longest on a prompted wait event 
+sessions-whr-wait_event.sql 	    :   Outputs session detail for sessions that have waited longest on prompted wait event 
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
-session-wait-summary.sql            : 	Counts the number of sessions waiting on each Oracle wait event.
+session-wait-summary.sql            : 	Counts the number of sessions waiting on each Oracle wait event
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
 session-whr-sid.sql		    :   Outputs session detail for a prompted session id (sid) 
@@ -80,19 +83,28 @@ sql-text-whr-sql_id.sql	    	    :   Outputs sql text for a prompted sql_id
 rds-support-tools/oracle/diag/shell
 #####################################
 get-alert-status.cli 		   :   	Bash script uses aws cli to extract Oracle alert log for a given db instance id and region 
+					Tip: Run list-oracle-inst-ids.cli to generate instance id list. 
 					Tested on aws-cli/1.10.30 
 
 list-oracle-inst-ids.cli           :    Bash script calls awscli to list oracle (se and ee) db-instance-ids in a region
                                         Tested on aws-cli/1.10.30
 
+oracle-sql-driver.cli		   :    Run as oracle-sql-driver.cli <db-inst-identifier.listfile > <oracle dba user> <sql script> <opt: region>
+					Prompts for <oracle dba user> password, then iterates over db-inst-identifier.listfile. 
+					Calls awscli to construct tns connect string, then connects and runs  <sql script> in each database. 
+					Same oracle dba user and password must exist in each database.
+					Tip: Run list-oracle-inst-ids.cli to generate instance id list. 
+					Tested on Ec2 Amazon linux, Bash shell, aws-cli/1.10.30 
+
 oracle-sql-driver.sh 		   : 	Run as oracle-sql-driver.sh <tns connections list file> <oracle dba user> <sql script> 
 					Prompts for <oracle dba user> password, then iterates over tns connection list, 
 					running <sql script> in each database. Same oracle dba user and password must 
-					exist in each database. 
+					exist in each database.  See sample connect list file: tns-connect-list.sample 
 					Tested on Ec2 Amazon linux, Bash shell 
 
-sqlplus.cli 			   :    Bash script accepts db-instance-identifier, oracle username and optional region as commandline parameters
+sqlplus.cli 			   :    Run as sqlplus.cli <db-instance-identifier>  <oracle username> <opt: region> 
 					Calls awscli to extract hostname, port and database name and constructs tns connect string
+					Tip: Run list-oracle-inst-ids.cli to generate instance id list.
 					Connects to database in sqlplus 
 					Tested on aws-cli/1.10.30					
 
