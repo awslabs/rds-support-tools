@@ -16,6 +16,7 @@
 #
 # get-alert-log.cli    Ref rds-support-tools/oracle/oracle.README
 
+# exit if required first parameter not present 
 if [[ ${1:-0} = 0 ]] ;  then
    clear 
    echo 
@@ -28,6 +29,7 @@ if [[ ${1:-0} = 0 ]] ;  then
 fi
 db_instance=$1 
 
+# allow commanline region to override default region else use default
 if [[ ${2:-0} = 0 ]] ;  then
   region=`aws configure get region`
   if [ -z "$region" ] ; then 
@@ -42,6 +44,8 @@ if [[ ${2:-0} = 0 ]] ;  then
 else
   region=$2
 fi 
+
+#parse out alert log name
 alert_name=`aws rds describe-db-log-files --db-instance-identifier $db_instance --region $region  | grep alert | head -1 | cut -d '"' -f4`
 
 echo 
@@ -54,7 +58,7 @@ echo
 echo 
 sleep 3 
 
-
+# dump alert log to stdout 
 aws rds download-db-log-file-portion \
 --db-instance-identifier $db_instance  --region $region \
 --log-file-name $alert_name --output text

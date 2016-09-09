@@ -82,7 +82,7 @@ sql-text-whr-sql_id.sql	    	    :   Outputs sql text for a prompted sql_id
 #####################################
 rds-support-tools/oracle/diag/shell
 #####################################
-get-alert-status.cli 		   :   	Bash script uses aws cli to extract Oracle alert log for a given db instance id and region 
+get-alert-log.cli 		   :   	Bash script uses aws cli to extract Oracle alert log for a given db instance id and region 
 					Tip: Run list-oracle-inst-ids.cli to generate instance id list. 
 					Tested on aws-cli/1.10.30 
 
