@@ -20,7 +20,7 @@ if [[ ${2:-0} = 0 ]] ;  then
    clear
    echo
    echo
-   echo "Usage:  psql.cli <db instance iddentifier> <postgres username> <opt: region>"
+   echo "Usage:  psql.cli <db instance identifier> <postgres username> <opt: region>"
    echo
    echo
    exit
