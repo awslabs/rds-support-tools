@@ -1,0 +1,49 @@
+
+#  See rds-support-tools/dms/dms.README
+{
+    "rules": [
+        {
+            "rule-type": "selection",
+            "rule-id": "1",
+            "rule-name": "select-scott",
+	    "rule-action": "include",
+            "object-locator": {
+                "schema-name": "SCOTT",
+                "table-name": "%"
+        	}
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "2",
+            "rule-name": "convert-schemas-to-lower",
+            "rule-action": "convert-lowercase",
+            "rule-target": "schema",
+            "object-locator": {
+                "schema-name": "%"
+                }
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "3",
+            "rule-name": "convert-tables-to-lower",
+            "rule-action": "convert-lowercase",
+            "rule-target": "table",
+            "object-locator": {
+                "schema-name": "%",
+                "table-name": "%"        
+	    	}
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "4",
+            "rule-name": "convert-columns-to-lowercase",
+            "rule-action": "convert-lowercase",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "%",
+                "table-name": "%",
+                "column-name": "%"
+            	}
+        }
+    ]
+}
