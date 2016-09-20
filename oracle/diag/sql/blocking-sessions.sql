@@ -15,11 +15,12 @@
  * and limitations under the License.
 */
 
+rem  blocking-sessions.sql Ref rds-support-tools/oracle/oracle.README
+
 ttitle left 'Summary of SQL_IDs and Wait Events With Blocking Sessions' skip left -
 ttitle left '==========================================================='
 clear breaks
 set lines 120
-undef blocking_session_id
 col wait_event format a30
 
 select * from (
@@ -35,26 +36,5 @@ select * from (
 	order by count(*) desc 
      ) 
 where rownum <=50 ;
-
-ttitle left 'Detail on a Specific Blocking Session ID' skip left -
-ttitle left '===========================================================' 
-col username format a10
-col client_program format a30
-col client_machine form a30 
-col obj_waiting_on form 999999
-
-select  sid,
-        serial#,
-        username,
-  	process client_pid,
-  	substr(machine,1,30) client_machine,
-	substr(program,1,30) client_program, 
-  	nvl(sql_id,0) sql_id, 
-  	event wait_event, 
-  	decode(row_wait_obj#,-1,0) obj_waiting_on,
-  	nvl(blocking_session,0) blocking_session
-from v$session 
-where sid = &blocking_session_id
-;
 
 ttitle off 

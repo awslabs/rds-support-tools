@@ -31,10 +31,19 @@ rds-support-tools/postgres/diag/sql
 #####################################
 rds-support-tools/postgres/diag/shell
 #####################################
+
+list-postgres-inst-ids.cli 	    :   Bash script calls awscli to list postgres db-instance-ids in a region
+                                        Tested on aws-cli/1.10.30
+
 pgpass				    :   Sample pgpass file to keep password off commandline 
 					Ref: https://www.postgresql.org/docs/current/static/libpq-pgpass.html
 					Tested on psql 9.2
 
+psql.cli			    :   Bash script accepts db-instance-identifier, postgres username and optional region as commandline parameters
+                                        Calls awscli to extract hostname, port and database name and connects to database in psql
+					Assumes password is in $HOME/.pgpass See example file  
+					Tip: Run list-postgres-inst-ids.cli to generate db-instance-identifier list. 
+                                        Tested on aws-cli/1.10.30
 
 #####################################
 rds-support-tools/postgres/diag/proc

@@ -15,24 +15,28 @@
  * and limitations under the License.
 */
 
-rem session-wait-summary.sql Ref rds-support-tools/oracle/oracle.README 
+rem session-sql-waits.sql Ref rds-support-tools/oracle/oracle.README 
 
+clear breaks 
+set head on 
 COL event FORM a40 HEAD "WAIT_EVENT"
 COL seq# FORM 999999
 SET WRAP OFF
 SET LINESIZE 110
 SET PAGES 80
 
-ttitle left 'Count of Sessions by Wait Event' skip left -
+ttitle left 'Count of Current Sessions by Sql ID and Wait Event' skip left -
 ttitle left '================================================================='
 
-SELECT
-  event,
-  count(*)
-FROM v$session_wait
-GROUP BY event
-ORDER BY count(*) DESC
+select * from (
+   SELECT
+  	sql_id,
+	event, 
+  	count(*)
+   FROM v$session
+   GROUP BY sql_id, event
+   ORDER BY count(*) DESC
+) where rownum < 50 
 ; 
 ttitle off
-
 

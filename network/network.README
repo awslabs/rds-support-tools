@@ -1,4 +1,4 @@
-mariadb.README 
+network.README 
  
 # Copyright 2016 Amazon.com, Inc. or its affiliates. 
 # All Rights Reserved.
@@ -15,29 +15,16 @@ mariadb.README
 # and limitations under the License.
  
 ##############################################################################
-MARIADB SCRIPTS  -  See also rds-support-tools/mysql/mysql.README
+NETWORK SCRIPTS 
 ##############################################################################
 
 
 script-name                          :  Description 
-					Tested on MariaDB <version>	
 
 #####################################
-rds-support-tools/mariadb/diag/sql
+rds-support-tools/network/diag/shell
 #####################################
 
 
 
-#####################################
-rds-support-tools/mariadb/diag/shell
-#####################################
-
-list-mariadb-inst-ids.cli          :   Bash script accepts optional region on commandline and calls awscli 
-				       Outputs list of db-instance-identifiers running mariadb 
-                                       Tested on aws-cli/1.10.30
-
-
-#####################################
-rds-support-tools/mariadb/diag/proc
-#####################################
 

@@ -31,9 +31,20 @@ rds-support-tools/mysql/diag/sql
 #####################################
 rds-support-tools/mysql/diag/shell 
 #####################################
+#
+list-mysql-inst-ids.cli		    :   Bash script accepts optional region on commandline 
+					Outputs list of db-instance-identifiers with mysql engine 
+					Tested on aws-cli/1.10.30 
+
 my.cnf				    :   Sample .my.cnf file to keep password off commandline
 					Ref http://dev.mysql.com/doc/refman/5.7/en/option-files.html
 					Tested om Mysql 5.7
+
+mysql.cli                           :   Bash script accepts db-instance-identifier, mysql username and optional region on commandline
+                                        Calls awscli to extract hostname, port and database name and connects to database in mysql
+                                        Assumes password is in $HOME/.my.cnf See example file
+					Tip: Run list-mysql-inst-ids.cli to generate db-instance-identifier list 
+                                        Tested on aws-cli/1.10.30, mysql 5.7, Mariadb 10.0, Aurora 5.6
 
 
 #####################################
