@@ -24,7 +24,13 @@ script-name                          :  Description
 #####################################
 rds-support-tools/network/diag/shell
 #####################################
+#
 
+vpc-rds-subnet-assoc.cli            :   Bash script accepts mandatory VPC on commandline. 
+                                        Outputs list of db-instance-endpoints with the subnets in
+                                        which they are running from (if Mulit AZ then current 
+                                        Primary instance subnet will be displayed). 
+                                        Tested on aws-cli/1.10.56
 
 
 
