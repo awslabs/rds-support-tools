@@ -26,6 +26,9 @@ script-name                          :  Description
 rds-support-tools/postgres/diag/sql
 #####################################
 
+list-grants.sql                     :  SQL to list all granted permission on a specified relation.
+                                       run as psql -v tbl_name=<your table name here> -f list-grants.sql
+                                       tested on PostgreSQL 9.x			
 
 
 #####################################
