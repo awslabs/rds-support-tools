@@ -26,7 +26,13 @@ script-name                          :  Description
 rds-support-tools/postgres/diag/sql
 #####################################
 
+grants-whr-table.sql                :  SQL to list all granted permission on a specified relation.
+                                       Run as psql -v tbl_name=<your table name here> -f grants-whr-table.sql
+                                       tested on PostgreSQL 9.x			
 
+list-databases-size.sql             :  List top 20 databases the user can connect to sorted by size.
+                                       I started with the query run by the \l+ psql command and sorted by size 
+                                       and added a limit of 20
 
 #####################################
 rds-support-tools/postgres/diag/shell
