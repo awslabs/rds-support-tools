@@ -26,7 +26,14 @@ script-name                          :   Description
 rds-support-tools/mysql/diag/sql
 #####################################
 
+blocking-sessions.sql               :   Show blocking sessions
+                    Tested on MySQL 5.6
 
+innodb-table-tablespace.sql         :   Show tablespace allocation for InnoDB engine tables. Show if table is allocated on system tablespace or per-file-tablespace 
+                    Tested on MySQL 5.6
+
+space-allocation.sql                :   Show sum of space allocation. Structures as CSV tables, binary logs and log files are not accounted. 
+                    Tested on MySQL 5.6
 
 #####################################
 rds-support-tools/mysql/diag/shell 
