@@ -35,10 +35,10 @@ innodb-table-tablespace.sql         :   Show tablespace allocation for InnoDB en
 space-allocation.sql                :   Show sum of space allocation. Structures as CSV tables, binary logs and log files are not accounted. 
                     Tested on MySQL 5.6
 
-kill-queries-builder.sql            :   Meta-query to build RDS Calls for mysql.rds_kill_query(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
+gen-kill-queries-command.sql            :   Meta-query to build RDS Calls for mysql.rds_kill_query(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
                     Tested on MySQL 5.6
 
-kill-sessions-builder.sql            :   Meta-query to build RDS Calls for mysql.rds_kill(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
+gen-kill-sessions-command.sql            :   Meta-query to build RDS Calls for mysql.rds_kill(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
                     Tested on MySQL 5.6
 
 #####################################
