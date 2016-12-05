@@ -78,6 +78,11 @@ session-whr-sid.sql		    :   Outputs session detail for a prompted session id (s
 sql-text-whr-sql_id.sql	    	    :   Outputs sql text for a prompted sql_id
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
+oracle-12-patch-list.sql            : Outputs list of Oracle patch installed - 12c versions EE, SE and SE2  only
+                    Tested on Oracle-SE 12.1, Oracle-SE2 12.1, Oracle-EE 12.1
+
+oracle-12-patch-list-verbose.sql            : Outputs list and details of Oracle patch installed - 12c versions EE, SE and SE2 only
+                    Tested on Oracle-SE 12.1, Oracle-SE2 12.1, Oracle-EE 12.1
 
 #####################################
 rds-support-tools/oracle/diag/shell
