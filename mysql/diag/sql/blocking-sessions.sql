@@ -14,16 +14,40 @@
  * and limitations under the License.
 */
 
+/* InnoDB Print All Deadlock setting information*/
+SELECT '' AS 
+' 
+* Check innodb_print_all_deadlocks setting 
+* Enable this option to print information about all InnoDB user transaction deadlocks in the error log.
+* Otherwise information about only the last deadlock is available in SHOW ENGINE INNODB STATUS.
+'\G
+SELECT IF(@@GLOBAL.innodb_print_all_deadlocks=0,'Parameter innodb_print_all_deadlocks is disabled.','Parameter innodb_print_all_deadlocks is enabled.') AS 'INNODB_PRINT_ALL_DEADLOCKS_STATUS';
+
+/* InnoDB Transaction and Loking Information*/
+SELECT '' AS '
+* InnoDB Transaction and Locking Information
+'\G
+
 SELECT
-    trx_id,
-    trx_state,
-    trx_wait_started,
-    trx_requested_lock_id,
-    time_to_sec(timediff(now(),trx_started)) AS cq,
-    lock_type,
-    lock_table,
-    lock_index,
-    lock_data 
-FROM
-    information_schema.innodb_trx LEFT JOIN information_schema.innodb_locks ON trx_requested_lock_id=lock_id
-;
+  r.trx_id waiting_trx_id,
+  r.trx_mysql_thread_id waiting_thread,
+  r.trx_query waiting_query,
+  b.trx_id blocking_trx_id,
+  b.trx_mysql_thread_id blocking_thread,
+  b.trx_query blocking_query
+FROM       information_schema.innodb_lock_waits w
+INNER JOIN information_schema.innodb_trx b
+  ON b.trx_id = w.blocking_trx_id
+INNER JOIN information_schema.innodb_trx r
+  ON r.trx_id = w.requesting_trx_id;
+
+SHOW ENGINE INNODB STATUS\G
+
+
+/* InnoDB Transaction and Loking Information*/
+SELECT '' AS '
+* Show Process list
+'\G
+SHOW PROCESSLIST;
+
+
