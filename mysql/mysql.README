@@ -59,6 +59,12 @@ mysql.cli                           :   Bash script accepts db-instance-identifi
 					Tip: Run list-mysql-inst-ids.cli to generate db-instance-identifier list 
                                         Tested on aws-cli/1.10.30, mysql 5.7, Mariadb 10.0, Aurora 5.6
 
+RDSDatabaseConnection.java	    :   Run as java RDSDatabaseConnection <hostname> <port> <username> <password> <database>
+					Java source file, takes 5 arguements when built
+					Performs several SQL statements using JDBC connecting to MySQL instance
+					Assumes JDBC package installed when compiled
+					Tested on Java 1.8, mysql 5.6
+
 
 #####################################
 rds-support-tools/mysql/diag/proc
