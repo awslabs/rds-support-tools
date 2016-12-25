@@ -35,10 +35,16 @@ innodb-table-tablespace.sql         :   Show tablespace allocation for InnoDB en
 space-allocation.sql                :   Show sum of space allocation. Structures as CSV tables, binary logs and log files are not accounted. 
                     Tested on MySQL 5.6
 
-gen-kill-queries-command.sql            :   Meta-query to build RDS Calls for mysql.rds_kill_query(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
+gen-kill-queries-command.sql        :   Meta-query to build RDS Calls for mysql.rds_kill_query(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
                     Tested on MySQL 5.6
 
-gen-kill-sessions-command.sql            :   Meta-query to build RDS Calls for mysql.rds_kill(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
+gen-kill-sessions-command.sql       :   Meta-query to build RDS Calls for mysql.rds_kill(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
+                    Tested on MySQL 5.6
+
+check-table-pk.sql                  :   Report tables having Primary Key defined per schema per table
+                    Tested on MySQL 5.6
+
+check-table-pk-columns.sql          :   Report columns partecipating in Primary Key definition per schema per table
                     Tested on MySQL 5.6
 
 #####################################
