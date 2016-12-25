@@ -47,6 +47,9 @@ check-table-pk.sql                  :   Report tables having Primary Key defined
 check-table-pk-columns.sql          :   Report columns partecipating in Primary Key definition per schema per table
                     Tested on MySQL 5.6
 
+check-table-pk-missing.sql          :   Report tables having Primary Key not defined. 
+                    Tested on MySQL 5.6
+
 #####################################
 rds-support-tools/mysql/diag/shell 
 #####################################
