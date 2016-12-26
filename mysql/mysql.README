@@ -50,7 +50,7 @@ check-table-pk-columns.sql              :   Report columns partecipating in Prim
 check-table-pk-missing.sql              :   Report tables having Primary Key not defined. 
                     Tested on MySQL 5.6
 
-eck-idx-btree-not-unque-redundancy.sql  :   Find single column B-Tree NOT UNIQUE indexes that are defined as prefix of another composed index too.  
+check-idx-btree-not-unque-redundancy.sql:   Find single column B-Tree NOT UNIQUE indexes that are defined as prefix of another composed index too.  
                     Tested on MySQL 5.6
 
 #####################################
