@@ -26,31 +26,31 @@ script-name                          :   Description
 rds-support-tools/mysql/diag/sql
 #####################################
 
-blocking-sessions.sql                   :   Show blocking sessions
+blocking-sessions.sql                  :   Show blocking sessions
                     Tested on MySQL 5.6
 
-innodb-table-tablespace.sql             :   Show tablespace allocation for InnoDB engine tables. Show if table is allocated on system tablespace or per-file-tablespace 
+innodb-table-whr-tablespace.sql        :   Show tablespace allocation for InnoDB engine tables. Show if table is allocated on system tablespace or per-file-tablespace 
                     Tested on MySQL 5.6
 
-space-allocation.sql                    :   Show sum of space allocation. Structures as CSV tables, binary logs and log files are not accounted. 
+space-allocation.sql                   :   Show sum of space allocation. Structures as CSV tables, binary logs and log files are not accounted. 
                     Tested on MySQL 5.6
 
-gen-kill-queries-command.sql            :   Meta-query to build RDS Calls for mysql.rds_kill_query(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
+gen-kill-queries-command.sql           :   Meta-query to build RDS Calls for mysql.rds_kill_query(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
                     Tested on MySQL 5.6
 
-gen-kill-sessions-command.sql           :   Meta-query to build RDS Calls for mysql.rds_kill(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
+gen-kill-sessions-command.sql          :   Meta-query to build RDS Calls for mysql.rds_kill(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
                     Tested on MySQL 5.6
 
-check-table-pk.sql                      :   Report tables having Primary Key defined per schema per table
+table-whr-pk.sql                       :   Report tables having Primary Key defined per schema per table
                     Tested on MySQL 5.6
 
-check-table-pk-columns.sql              :   Report columns partecipating in Primary Key definition per schema per table
+table-whr-pk-columns.sql               :   Report columns partecipating in Primary Key definition per schema per table
                     Tested on MySQL 5.6
 
-check-table-pk-missing.sql              :   Report tables having Primary Key not defined. 
+table-whr-pk-missing.sql               :   Report tables having Primary Key not defined. 
                     Tested on MySQL 5.6
 
-check-idx-btree-not-unque-redundancy.sql:   Find single column B-Tree NOT UNIQUE indexes that are defined as prefix of another composed index too.  
+idx-btree-whr-not-unque-redundancy.sql :   Find single column B-Tree NOT UNIQUE indexes that are redundant as defined as prefix of another composed index too.  
                     Tested on MySQL 5.6
 
 #####################################
