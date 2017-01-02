@@ -55,7 +55,7 @@ select * from
 	--order by parse_calls/executions desc
 	--order by executions desc
 )
-where rownum <= 50
+where rownum <= 20
 ; 
 
 
