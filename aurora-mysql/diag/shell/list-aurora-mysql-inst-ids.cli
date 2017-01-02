@@ -21,7 +21,7 @@ if [[ ${1:-0} = 0 ]] ;  then
   if [ -z "$region" ] ; then
         clear
         echo
-        echo "Usage:  list-aurora-inst-ids.cli <opt: region>"
+        echo "Usage:  list-aurora-mysql-inst-ids.cli <opt: region>"
         echo Region is not specified on command line and default is not set
         echo
         echo
