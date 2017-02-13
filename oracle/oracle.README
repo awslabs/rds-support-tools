@@ -53,6 +53,15 @@ hello-world.sql 		    :   Selects "Hello World!"  from dual. Can be used for tes
 longops-whr-sid.sql 		    :   Queries timing info from v$session_longops for prompted session id (sid)
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
+oracle-12-patch-list.sql            :   Outputs list of Oracle patch installed - 12c versions EE, SE and SE2  only
+                                        Tested on Oracle-SE 12.1, Oracle-SE2 12.1, Oracle-EE 12.1
+
+oracle-12-patch-list-verbose.sql    :   Outputs list and details of Oracle patch installed - 12c versions EE, SE and SE2 only
+                                        Tested on Oracle-SE 12.1, Oracle-SE2 12.1, Oracle-EE 12.1
+
+perm-tablespace-spage.sql 	    :   Outputs total space, free space and percent free of permanent tablespaces 
+					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
+
 recommend-redolog-size-count.sql    :   Checks whether redologs are of adequate size and number for a heavy workload
                                         that has been running for at least 20 minutes.  Makes recommendations.
                                         Tested on Oracle-SE2 12.1, Oracle-EE 12.1
@@ -78,11 +87,11 @@ session-whr-sid.sql		    :   Outputs session detail for a prompted session id (s
 sql-text-whr-sql_id.sql	    	    :   Outputs sql text for a prompted sql_id
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
-oracle-12-patch-list.sql            : Outputs list of Oracle patch installed - 12c versions EE, SE and SE2  only
-                    Tested on Oracle-SE 12.1, Oracle-SE2 12.1, Oracle-EE 12.1
+temp-tablespace-space.sql 	    :   Outputs total temp space, free temp space and percent free 
+					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
-oracle-12-patch-list-verbose.sql            : Outputs list and details of Oracle patch installed - 12c versions EE, SE and SE2 only
-                    Tested on Oracle-SE 12.1, Oracle-SE2 12.1, Oracle-EE 12.1
+temp-tablespace-usage.sql 	    :   Outputs information about sessions currently using temp space
+					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
 #####################################
 rds-support-tools/oracle/diag/shell
