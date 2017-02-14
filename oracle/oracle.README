@@ -16,11 +16,6 @@ oracle.README
 
 
 
-
- cp tns-connect-list.sample rds-support-tools/oracle/diag/shell/
-(python34)[ec2-user@ip-10-0-4-22 dholmer]$ cp exec-sql-driver.sh rds-support-tools/oracle/diag/shell/
-(python34)[ec2-user@ip-10-0-4-22 dholmer]$ cp hello-world.sql rds-support-tools/oracle/diag/sql/
-
  
 ##############################################################################
 ORACLE SCRIPTS 
@@ -50,6 +45,10 @@ gen-kill-command-whr-sid.sql 	    :   Outputs kill command for a prompted sessio
 hello-world.sql 		    :   Selects "Hello World!"  from dual. Can be used for testing. 
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
+indexes-whr-table.sql 		    :   Outputs index information including indexed columns 
+					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
+
+
 longops-whr-sid.sql 		    :   Queries timing info from v$session_longops for prompted session id (sid)
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
@@ -59,7 +58,7 @@ oracle-12-patch-list.sql            :   Outputs list of Oracle patch installed -
 oracle-12-patch-list-verbose.sql    :   Outputs list and details of Oracle patch installed - 12c versions EE, SE and SE2 only
                                         Tested on Oracle-SE 12.1, Oracle-SE2 12.1, Oracle-EE 12.1
 
-perm-tablespace-spage.sql 	    :   Outputs total space, free space and percent free of permanent tablespaces 
+perm-tablespace-space.sql 	    :   Outputs total space, free space and percent free of permanent tablespaces 
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
 recommend-redolog-size-count.sql    :   Checks whether redologs are of adequate size and number for a heavy workload
