@@ -14,16 +14,17 @@ cloudwatch.README
 # either express or implied. See the License for the specific language governing permissions 
 # and limitations under the License.
 
-
+  
 ##############################################################################
-CLOUDWATCH SCRIPTS 
+RDS ENHANCED MONITORING SCRIPTS
 ##############################################################################
-
 
 script-name                          :  Description 
-					Tested on <> 
 
 #####################################
-rds-support-tools/cloudwatch/
+RDS ENHANCED MONITORING SCRIPTS
 #####################################
+#
 
+RDSCreateMetricsFromEnhancedMonitoring.py           :	script from the article https://aws.amazon.com/premiumsupport/knowledge-center/custom-cloudwatch-metrics-rds/
+                                        		Tested on python 2.7 and 3
