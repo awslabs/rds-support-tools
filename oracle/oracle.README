@@ -68,6 +68,9 @@ recommend-redolog-size-count.sql    :   Checks whether redologs are of adequate 
 session-sql-waits.sql	    	    :   Counts number of sessions currently running sql with same wait event 
 					Tested Oracle-SE2 12.1, Oracle-EE 12.1 
 
+sessions-using-temp-space.sql.sql   :   Outputs information about sessions currently using temp space
+                                        Tested on Oracle-SE2 12.1, Oracle-EE 12.1
+
 sessions-whr-username.sql 	    :   Outputs session detail for sessions logged in as a prompted username
 					Tested Oracle-SE2 12.1, Oracle-EE 12.1 
 					
@@ -89,8 +92,6 @@ sql-text-whr-sql_id.sql	    	    :   Outputs sql text for a prompted sql_id
 temp-tablespace-space.sql 	    :   Outputs total temp space, free temp space and percent free 
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
-temp-tablespace-usage.sql 	    :   Outputs information about sessions currently using temp space
-					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
 #####################################
 rds-support-tools/oracle/diag/shell
