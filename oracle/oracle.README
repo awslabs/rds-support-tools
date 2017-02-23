@@ -31,6 +31,10 @@ rds-support-tools/oracle/diag/sql
 blocking-sessions.sql               : 	Counts number of current waiters in v$session who have blockers
 					Tested Oracle-SE2 12.1, Oracle-EE 12.1
 
+constraints-whr-table.sql 	    :   4 queries: Primary + Unique Keys, Foreign keys, Indexes Foreign Keys
+					and Check Constraints 
+					Tested Oracle-SE2 12.1, Oracle-EE 12.1 
+
 expensive-sql.sql 		    :   Outputs 50 most expensive sql statements in order of largest buffer_gets/execution 
 					User can comment out this "order by" clause and uncomment another for a different view 
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
