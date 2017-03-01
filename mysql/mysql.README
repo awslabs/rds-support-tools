@@ -27,31 +27,38 @@ rds-support-tools/mysql/diag/sql
 #####################################
 
 blocking-sessions.sql                  :   Show blocking sessions
-                    Tested on MySQL 5.6
+                    			   Tested on MySQL 5.6
 
 innodb-table-whr-tablespace.sql        :   Show tablespace allocation for InnoDB engine tables. Show if table is allocated on system tablespace or per-file-tablespace 
-                    Tested on MySQL 5.6
+                    			   Tested on MySQL 5.6
 
 space-allocation.sql                   :   Show sum of space allocation. Structures as CSV tables, binary logs and log files are not accounted. 
-                    Tested on MySQL 5.6
+                    			   Tested on MySQL 5.6
 
 gen-kill-queries-command.sql           :   Meta-query to build RDS Calls for mysql.rds_kill_query(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
-                    Tested on MySQL 5.6
+                    			   Tested on MySQL 5.6
 
 gen-kill-sessions-command.sql          :   Meta-query to build RDS Calls for mysql.rds_kill(id) based of INFORMATION_SCHEMA.PROCESSLIST selection.
-                    Tested on MySQL 5.6
+                    		           Tested on MySQL 5.6
+
+idx-btree-whr-not-unque-redundancy.sql :   Find single column B-Tree NOT UNIQUE indexes that are redundant as defined as prefix of another composed index too.
+                                           Tested on MySQL 5.6
 
 table-whr-pk.sql                       :   Report tables having Primary Key defined per schema per table
-                    Tested on MySQL 5.6
+                    			   Tested on MySQL 5.6
 
 table-whr-pk-columns.sql               :   Report columns partecipating in Primary Key definition per schema per table
-                    Tested on MySQL 5.6
+                    			   Tested on MySQL 5.6
 
 table-whr-pk-missing.sql               :   Report tables having Primary Key not defined. 
-                    Tested on MySQL 5.6
+                    			   Tested on MySQL 5.6
 
-idx-btree-whr-not-unque-redundancy.sql :   Find single column B-Tree NOT UNIQUE indexes that are redundant as defined as prefix of another composed index too.  
-                    Tested on MySQL 5.6
+tables-whr-autoincrement.sql	       :   All tables with auto-incremented columns 
+					   Tested on MySQL 5.7
+
+tables-whr-no-autoincrement.sql        :   All tables with non-autoincremented columns containing integers
+					   Tested on MySQL 5.7 
+						
 
 #####################################
 rds-support-tools/mysql/diag/shell 
