@@ -24,40 +24,40 @@ for AWS Database blog post "Query your AWS Database from a Serverless Applicatio
 published March 2018: https://aws.amazon.com/blogs/database/
 
 script-name                     Description
-					                      Tested on 
+				Tested on 
 
-serverless-query-cfn.json		    CloudFormation template used to create roles, privileges, 
-					                      Lambda function and API Gateway REST API 
+serverless-query-cfn.json	CloudFormation template used to create roles, privileges, 
+				Lambda function and API Gateway REST API 
                                 for serverless application example. 
 
 
 #Mysql Example				
 					  
-   mysql-insert.sql 			      Create table and insert 2 sample rows for testing
-					                      Tested on mysql5.6
+   mysql-insert.sql		Create table and insert 2 sample rows for testing
+   				Tested on mysql5.6
 
    serverless-query.py.mysql    Python code sample for serverless application
-                                querying RDS mysql database with best practices.  
-					                      Tested on mysql5.6 and python3.6
+                                querying RDS mysql database with best practices.
+				Tested on mysql5.6 and python3.6
 
 #PostgreSQL Example 
    
    
-   postgresql-insert.sql 	      Create table and insert 2 sample rows for testing
-					                      Tested on postgresql9.6 
+   postgresql-insert.sql	Create table and insert 2 sample rows for testing.
+   				Tested on postgresql9.6 
 
    serverless-query.py.mysql    Python code sample for serverless application 
-					                      querying RDS postgres database with best practices.  
-					                      Tested on postgresql9.6 and python3.6
+				querying RDS postgres database with best practices.  
+				Tested on postgresql9.6 and python3.6
 
 #Neptune(SPARQL) Example 
  
-   neptune-insert.ru 	          Create table and insert 2 sample rows for testing
-					                      Tested on neptune 1.0.1.0 
+   neptune-insert.ru		Create table and insert 2 sample rows for testing
+				Tested on neptune 1.0.1.0 
 
    serverless-query.py.sparql   Python code sample for serverless application 
-					                      querying RDS postgres database with best practices.  
-					                      Tested on neptune 1.0.1.0 and python3.6
+   				querying RDS postgres database with best practices. 
+				Tested on neptune 1.0.1.0 and python3.6
 
 
 
