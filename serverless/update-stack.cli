@@ -1,0 +1,16 @@
+
+aws cloudformation update-stack --stack-name serverless-query-cfn \
+--use-previous-template \
+--region your-database-region \
+--capabilities CAPABILITY_NAMED_IAM \
+--parameters '[
+   {"ParameterKey":"PEndpoint","ParameterValue":"your-database-endpoint"},
+   {"ParameterKey":"PPort","ParameterValue":"your-database-port"},
+   {"ParameterKey":"PDatabase","ParameterValue":"your-database-name"},
+   {"ParameterKey":"PDbUser","ParameterValue":"your-db-user-name"},
+   {"ParameterKey":"PDbPassword","ParameterValue":"your-db-user-password"},
+   {"ParameterKey":"PS3Bucket","ParameterValue":"your-S3-bucket-name"},
+   {"ParameterKey":"PSubnetIds","ParameterValue":"your-EC2-client-SubnetId"},
+   {"ParameterKey":"PSecurityGroupIds","ParameterValue":"your-EC2-client-SecurityGroupId"}
+ ]'
+

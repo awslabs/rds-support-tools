@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# serverless database query - sparql example
+# serverless database query - mysql example
 
 # Copyright 2016 Amazon.com, Inc. or its affiliates.
 # All Rights Reserved.
@@ -16,30 +16,25 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
-from SPARQLWrapper import SPARQLWrapper, JSON
+import pymysql
 import logging
 import traceback
 from os import environ
 
 endpoint=environ.get('ENDPOINT')
 port=environ.get('PORT')
+dbuser=environ.get('DBUSER')
+password=environ.get('DBPASSWORD')
+database=environ.get('DATABASE')
 
-baseURI="http://{0}:{1}/sparql".format(endpoint,port)
-
-query="""
-    SELECT ?hello ?world
-    WHERE { GRAPH  <amzn://serverless_test>  { ?s ?hello ?world } }
-    """
+query="SELECT * FROM amzn.serverless_test LIMIT 2"
 
 logger=logging.getLogger()
 logger.setLevel(logging.INFO)
 
-def sparql_config():
-    cfg=SPARQLWrapper(baseURI)
-    cfg.setQuery(query)
-    cfg.setReturnFormat(JSON)
-    return cfg
-
+def make_connection():
+    return pymysql.connect(host=endpoint, user=dbuser, passwd=password,
+        port=int(port), db=database)
 
 def log_err(errmsg):
     logger.error(errmsg)
@@ -47,30 +42,41 @@ def log_err(errmsg):
         "isBase64Encoded":"false"}
 
 try:
-    sparql=sparql_config() 
-    # test config 
-    sparql.query()
+    cnx = make_connection()
     logger.info("Cold start complete.")
 except:
-    conn_info='\nEndpoint: {0}\nPort: {1}\n'.format(endpoint, port)
-    logger.error(conn_info)
-    exit(log_err ("\nERROR: Cold start failed. Bad config.\n{}".format (
-       traceback.format_exc())))  
-
+    conn_info='\nEndpoint: {0}\nPort: {1}\nDbUser: {2}\nPassword: *******\nDatabase={3}\n'.format(
+        endpoint, port, dbuser, database)
+    logger.error(conn_info) 
+    exit(log_err ("\nERROR: Cold start failed. Cannot connect to database from outside handler.\n{0}\n".format(
+        traceback.format_exc()))) 
 
 def handler(event,context):
 
+    global cnx
+
     try:
-        results=sparql.query().convert()
+        cursor=cnx.cursor()
+        cursor.execute(query)
     except:
-        return log_err("ERROR: Cannot execute sparql query.\n{}".format(
-            traceback.format_exc()))
+        try:
+            cnx = make_connection()
+            cursor=cnx.cursor()
+            logger.info("Database connection lost. Re-connected from inside handler.")
+        except:
+            return log_err("ERROR: Cannot connect to database from inside handler.\n{}".format(
+                traceback.format_exc()))
+        try:
+            cursor.execute(query)
+        except:
+            return log_err ("ERROR: Cannot execute cursor.\n{}".format(
+                traceback.format_exc()) )
 
     try:
         results_list=[]
-        for result in results["results"]["bindings"]:
-            results_list.append("%s , %s" % (result['hello']['value'], result['world']['value']))
+        for result in cursor: results_list.append(result)
         print(results_list)
+        cursor.close()
     except:
         return log_err ("ERROR: Cannot retrieve query data.\n{}".format(
             traceback.format_exc()))
