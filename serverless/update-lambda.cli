@@ -1,0 +1,6 @@
+aws lambda update-function-code \
+--function-name ServerlessQuery \
+--region your-database-region \
+--s3-bucket your-s3-bucket-name \
+--s3-key serverless-query.zip 
+
