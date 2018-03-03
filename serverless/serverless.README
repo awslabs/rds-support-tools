@@ -30,6 +30,11 @@ serverless-query-cfn.json	CloudFormation template used to create roles, privileg
 				Lambda function and API Gateway REST API 
                                 for serverless application example. 
 
+create-stack.cli  		Create CFN stack. 
+
+
+invoke-lambda.cli		Invoke Lambda function manually to test. 
+
 
 #Mysql Example				
 					  
