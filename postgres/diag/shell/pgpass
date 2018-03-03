@@ -1,2 +1,6 @@
 # Alternatively you can set environment variable PGPASSWORD
-*:*:*:*:<password>  
+
+#Syntax: hostname:port:database:username:password
+#Sample: localhost:5432:testdb:postgres:Password#123
+
+*:*:*:*:<password>
