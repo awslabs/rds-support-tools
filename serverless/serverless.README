@@ -35,6 +35,10 @@ create-stack.cli  		Create CFN stack.
 
 invoke-lambda.cli		Invoke Lambda function manually to test. 
 
+update-stack.cli 		Update CFN template parameters.
+
+update-lambda.cli 		Update lambda function with new serverless-query.zip.
+			
 
 #Mysql Example				
 					  
@@ -61,7 +65,7 @@ invoke-lambda.cli		Invoke Lambda function manually to test.
 				Tested on neptune 1.0.1.0 
 
    serverless-query.py.sparql   Python code sample for serverless application 
-   				querying RDS postgres database with best practices. 
+   				querying Neptune database using sparql. 
 				Tested on neptune 1.0.1.0 and python3.6
 
 
