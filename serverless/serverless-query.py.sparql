@@ -48,13 +48,9 @@ def log_err(errmsg):
 
 try:
     sparql=sparql_config() 
-    # test config 
-    sparql.query()
     logger.info("Cold start complete.")
 except:
-    conn_info='\nEndpoint: {0}\nPort: {1}\n'.format(endpoint, port)
-    logger.error(conn_info)
-    exit(log_err ("\nERROR: Cold start failed. Bad config.\n{}".format (
+    exit(log_err ("\nERROR: Cold start failed.\n{}".format (
        traceback.format_exc())))  
 
 
@@ -63,6 +59,8 @@ def handler(event,context):
     try:
         results=sparql.query().convert()
     except:
+        conn_info='\nEndpoint: {0}\nPort: {1}\n'.format(endpoint, port)
+        logger.error(conn_info)
         return log_err("ERROR: Cannot execute sparql query.\n{}".format(
             traceback.format_exc()))
 
