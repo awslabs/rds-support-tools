@@ -41,35 +41,42 @@ def log_err(errmsg):
     return {"body": errmsg , "headers": {}, "statusCode": 400,
         "isBase64Encoded":"false"}
 
+logger.info("Cold start complete.") 
+
 def handler(event,context):
 
     try:
         cnx = make_connection()
         cursor=cnx.cursor()
-    except:
-        return log_err("ERROR: Cannot connect to database from inside handler.\n{}".format(
-            traceback.format_exc()))
 
-    try:
-        cursor.execute(query)
-    except:
-        return log_err ("ERROR: Cannot execute cursor.\n{}".format(
-            traceback.format_exc()) )
+        try:
+            cursor.execute(query)
+        except:
+            return log_err ("ERROR: Cannot execute cursor.\n{}".format(
+                traceback.format_exc()) )
 
-    try:
-        results_list=[]
-        for result in cursor: results_list.append(result)
-        print(results_list)
-        cursor.close()
-        cnx.close() 
+        try:
+            results_list=[]
+            for result in cursor: results_list.append(result)
+            print(results_list)
+            cursor.close()
 
-    except:
-        return log_err ("ERROR: Cannot retrieve query data.\n{}".format(
-            traceback.format_exc()))
+        except:
+            return log_err ("ERROR: Cannot retrieve query data.\n{}".format(
+                traceback.format_exc()))
 
 
-    return {"body": str(results_list), "headers": {}, "statusCode": 200,
+        return {"body": str(results_list), "headers": {}, "statusCode": 200,
         "isBase64Encoded":"false"}
+
+    
+    except:
+        return log_err("ERROR: Cannot connect to database from handler.\n{}".format(
+            traceback.format_exc()))
+
+
+    finally:
+        cnx.close()
 
 if __name__== "__main__":
     handler(None,None)
