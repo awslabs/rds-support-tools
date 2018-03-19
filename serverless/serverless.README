@@ -61,7 +61,7 @@ update-lambda.cli 		Update lambda function with new serverless-query.zip.
 
 #Neptune(SPARQL) Example 
  
-   neptune-insert.ru		Create table and insert 2 sample rows for testing
+   sparql-insert.ru		Create table and insert 2 sample rows for testing
 				Tested on neptune 1.0.1.0 
 
    serverless-query.py.sparql   Python code sample for serverless application 

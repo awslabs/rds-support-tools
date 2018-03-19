@@ -34,7 +34,7 @@ logger.setLevel(logging.INFO)
 
 def make_connection():
     return pymysql.connect(host=endpoint, user=dbuser, passwd=password,
-        port=int(port), db=database)
+        port=int(port), db=database, autocommit=True)
 
 def log_err(errmsg):
     logger.error(errmsg)
