@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# serverless database query -- postgreSQL example
+# serverless database query - mysql example
 
 # Copyright 2016 Amazon.com, Inc. or its affiliates.
 # All Rights Reserved.
@@ -16,11 +16,11 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
+
 import psycopg2
 import logging
 import traceback
 from os import environ
-
 
 endpoint=environ.get('ENDPOINT')
 port=environ.get('PORT')
@@ -44,43 +44,28 @@ def log_err(errmsg):
     return {"body": errmsg , "headers": {}, "statusCode": 400,
         "isBase64Encoded":"false"}
 
-try:
-    cnx = make_connection()
-    logger.info("Cold start complete.")
-except:
-    conn_info='Endpoint: {0}\nPort: {1}\nDbUser: {2}\nPassword: *******\nDatabase={3}\n'.format(
-        endpoint, port, dbuser, database)
-    logger.error(conn_info)
-    exit(log_err ("\nERROR: Cold start failed. Cannot connect to database from outside handler.\n{0}\n".format(
-        traceback.format_exc())))
-
-
 def handler(event,context):
 
-    global cnx
+    try:
+        cnx = make_connection()
+        cursor=cnx.cursor()
+    except:
+        return log_err("ERROR: Cannot connect to database from inside handler.\n{}".format(
+            traceback.format_exc()))
 
     try:
-        cursor=cnx.cursor()
         cursor.execute(query)
     except:
-        try:
-            cnx = make_connection()
-            cursor=cnx.cursor()
-            logger.info("Database connection lost. Re-connected from inside handler.")
-        except:
-            return log_err("ERROR: Cannot connect to database from inside handler.\n{}".format(
-                traceback.format_exc()))
-        try:
-            cursor.execute(query)
-        except:
-            return log_err ("ERROR: Cannot execute cursor.\n{}".format(
-                traceback.format_exc()) )
+        return log_err ("ERROR: Cannot execute cursor.\n{}".format(
+            traceback.format_exc()) )
 
     try:
         results_list=[]
         for result in cursor: results_list.append(result)
         print(results_list)
         cursor.close()
+        cnx.close() 
+
     except:
         return log_err ("ERROR: Cannot retrieve query data.\n{}".format(
             traceback.format_exc()))
