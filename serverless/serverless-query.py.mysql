@@ -48,7 +48,7 @@ def handler(event,context):
     try:
         cnx = make_connection()
         cursor=cnx.cursor()
-
+        
         try:
             cursor.execute(query)
         except:
@@ -76,7 +76,10 @@ def handler(event,context):
 
 
     finally:
-        cnx.close()
+        try:
+            cnx.close()
+        except: 
+            pass 
 
 if __name__== "__main__":
     handler(None,None)
