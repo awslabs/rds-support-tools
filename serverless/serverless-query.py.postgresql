@@ -79,8 +79,13 @@ def handler(event,context):
         return log_err("ERROR: Cannot connect to database from handler.\n{}".format(
             traceback.format_exc()))
 
+
     finally:
-        cnx.close()
+        try:
+            cnx.close()
+        except:
+            pass
+
 
 if __name__== "__main__":
     handler(None,None)
