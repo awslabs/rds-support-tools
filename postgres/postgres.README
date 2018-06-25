@@ -51,6 +51,13 @@ psql.cli			    :   Bash script accepts db-instance-identifier, postgres username
 					Tip: Run list-postgres-inst-ids.cli to generate db-instance-identifier list. 
                                         Tested on aws-cli/1.10.30
 
+postgresql-diagnostics.sh           :   Bash script that can be added to a crontab of a bastion host to collect diagnostic information from the RDS PostgreSQL instance or executed add-hoc
+                                        Uses .pgpass password file as official PostgreSQL method recommends
+                                        Calls are made to the instance directly to execute SQL commands and output is redirected to output file
+                                        Requires endpoint, role and database to be passed as execution parameters
+
+
+
 #####################################
 rds-support-tools/postgres/diag/proc
 #####################################
