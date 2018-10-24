@@ -12,6 +12,7 @@
 * [List tables and its ages](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-tables-age.sql)
 * [List sessions that are blocking others](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-sessions-blocking-others.sql) 
 * [List tables and its bloat ratio](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-tables-bloated.sql)
+* [List indexes and its bloat ratio](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-btree-bloat.sql) 
 
 ## Shell scripts:
 
