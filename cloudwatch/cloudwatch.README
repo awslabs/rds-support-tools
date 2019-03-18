@@ -1,4 +1,4 @@
-network.README 
+cloudwatch.README 
  
 # Copyright 2016 Amazon.com, Inc. or its affiliates. 
 # All Rights Reserved.
@@ -13,24 +13,18 @@ network.README
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
 # either express or implied. See the License for the specific language governing permissions 
 # and limitations under the License.
- 
-##############################################################################
-NETWORK SCRIPTS 
-##############################################################################
 
+  
+##############################################################################
+RDS ENHANCED MONITORING SCRIPTS
+##############################################################################
 
 script-name                          :  Description 
 
 #####################################
-rds-support-tools/network/diag/shell
+RDS ENHANCED MONITORING SCRIPTS
 #####################################
 #
 
-vpc-rds-subnet-assoc.cli            :   Bash script accepts mandatory VPC on commandline. 
-                                        Outputs list of db-instance-endpoints with the subnets in
-                                        which they are running from (if Mulit AZ then current 
-                                        Primary instance subnet will be displayed). 
-                                        Tested on aws-cli/1.10.56
-
-
-
+RDSCreateMetricsFromEnhancedMonitoring.py           :	script from the article https://aws.amazon.com/premiumsupport/knowledge-center/custom-cloudwatch-metrics-rds/
+                                        		Tested on python 2.7 and 3

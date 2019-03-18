@@ -26,7 +26,13 @@ script-name                          :  Description
 rds-support-tools/postgres/diag/sql
 #####################################
 
+grants-whr-table.sql                :  SQL to list all granted permission on a specified relation.
+                                       Run as psql -v tbl_name=<your table name here> -f grants-whr-table.sql
+                                       tested on PostgreSQL 9.x			
 
+list-databases-size.sql             :  List top 20 databases the user can connect to sorted by size.
+                                       I started with the query run by the \l+ psql command and sorted by size 
+                                       and added a limit of 20
 
 #####################################
 rds-support-tools/postgres/diag/shell
@@ -44,6 +50,13 @@ psql.cli			    :   Bash script accepts db-instance-identifier, postgres username
 					Assumes password is in $HOME/.pgpass See example file  
 					Tip: Run list-postgres-inst-ids.cli to generate db-instance-identifier list. 
                                         Tested on aws-cli/1.10.30
+
+postgresql-diagnostics.sh           :   Bash script that can be added to a crontab of a bastion host to collect diagnostic information from the RDS PostgreSQL instance or executed add-hoc
+                                        Uses .pgpass password file as official PostgreSQL method recommends
+                                        Calls are made to the instance directly to execute SQL commands and output is redirected to output file
+                                        Requires endpoint, role and database to be passed as execution parameters
+
+
 
 #####################################
 rds-support-tools/postgres/diag/proc

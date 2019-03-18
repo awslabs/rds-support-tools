@@ -16,11 +16,6 @@ oracle.README
 
 
 
-
- cp tns-connect-list.sample rds-support-tools/oracle/diag/shell/
-(python34)[ec2-user@ip-10-0-4-22 dholmer]$ cp exec-sql-driver.sh rds-support-tools/oracle/diag/shell/
-(python34)[ec2-user@ip-10-0-4-22 dholmer]$ cp hello-world.sql rds-support-tools/oracle/diag/sql/
-
  
 ##############################################################################
 ORACLE SCRIPTS 
@@ -36,6 +31,10 @@ rds-support-tools/oracle/diag/sql
 blocking-sessions.sql               : 	Counts number of current waiters in v$session who have blockers
 					Tested Oracle-SE2 12.1, Oracle-EE 12.1
 
+constraints-whr-table.sql 	    :   4 queries: Primary + Unique Keys, Foreign keys, Indexes Foreign Keys
+					and Check Constraints 
+					Tested Oracle-SE2 12.1, Oracle-EE 12.1 
+
 expensive-sql.sql 		    :   Outputs 50 most expensive sql statements in order of largest buffer_gets/execution 
 					User can comment out this "order by" clause and uncomment another for a different view 
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
@@ -50,7 +49,20 @@ gen-kill-command-whr-sid.sql 	    :   Outputs kill command for a prompted sessio
 hello-world.sql 		    :   Selects "Hello World!"  from dual. Can be used for testing. 
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
+indexes-whr-table.sql 		    :   Outputs index information including indexed columns 
+					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
+
+
 longops-whr-sid.sql 		    :   Queries timing info from v$session_longops for prompted session id (sid)
+					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
+
+oracle-12-patch-list.sql            :   Outputs list of Oracle patch installed - 12c versions EE, SE and SE2  only
+                                        Tested on Oracle-SE 12.1, Oracle-SE2 12.1, Oracle-EE 12.1
+
+oracle-12-patch-list-verbose.sql    :   Outputs list and details of Oracle patch installed - 12c versions EE, SE and SE2 only
+                                        Tested on Oracle-SE 12.1, Oracle-SE2 12.1, Oracle-EE 12.1
+
+perm-tablespace-space.sql 	    :   Outputs total space, free space and percent free of permanent tablespaces 
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
 recommend-redolog-size-count.sql    :   Checks whether redologs are of adequate size and number for a heavy workload
@@ -59,6 +71,9 @@ recommend-redolog-size-count.sql    :   Checks whether redologs are of adequate 
 
 session-sql-waits.sql	    	    :   Counts number of sessions currently running sql with same wait event 
 					Tested Oracle-SE2 12.1, Oracle-EE 12.1 
+
+sessions-using-temp-space.sql.sql   :   Outputs information about sessions currently using temp space
+                                        Tested on Oracle-SE2 12.1, Oracle-EE 12.1
 
 sessions-whr-username.sql 	    :   Outputs session detail for sessions logged in as a prompted username
 					Tested Oracle-SE2 12.1, Oracle-EE 12.1 
@@ -77,6 +92,9 @@ session-whr-sid.sql		    :   Outputs session detail for a prompted session id (s
 
 sql-text-whr-sql_id.sql	    	    :   Outputs sql text for a prompted sql_id
 					Tested on Oracle-SE2 12.1, Oracle-EE 12.1
+
+temp-tablespace-space.sql 	    :   Outputs total temp space, free temp space and percent free 
+					Tested on Oracle-SE2 12.1, Oracle-EE 12.1 
 
 
 #####################################

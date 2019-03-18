@@ -1,4 +1,4 @@
-aurora.README 
+aurora-mysql.README 
  
 # Copyright 2016 Amazon.com, Inc. or its affiliates. 
 # All Rights Reserved.
@@ -15,7 +15,7 @@ aurora.README
 # and limitations under the License.
  
 ##############################################################################
-AURORA SCRIPTS     -   See also rds-support-tools/mysql/mysql.README
+AURORA-MYSQL SCRIPTS     -   See also rds-support-tools/mysql/mysql.README
 ##############################################################################
 
 
@@ -23,22 +23,22 @@ script-name                          :  Description
 					Tested on Aurora <version>
 
 #####################################
-rds-support-tools/aurora/diag/sql
+rds-support-tools/aurora-mysql/diag/sql
 #####################################
 
 
 
 #####################################
-rds-support-tools/aurora/diag/shell
+rds-support-tools/aurora-mysql/diag/shell
 #####################################
 
 
-list-aurora-inst-ids.cli          :   Bash script accepts optional region on commandline, calls awscli 
-				      Outputs db-instance-idenfifiers running aurora
+list-aurora-mysql-inst-ids.cli          :   Bash script accepts optional region on commandline, calls awscli 
+				      Outputs db-instance-idenfifiers running aurora-mysql
                                       Tested on aws-cli/1.10.30
 
 
 #####################################
-rds-support-tools/aurora/diag/proc
+rds-support-tools/aurora-mysql/diag/proc
 #####################################
 
