@@ -88,3 +88,9 @@ RDSDatabaseConnection.java	    :   Run as java RDSDatabaseConnection <hostname> 
 rds-support-tools/mysql/diag/proc
 #####################################
 
+
+#####################################
+rds-support-tools/mysql/rds-binlog-to-s3
+#####################################
+rds-binlog-to-s3.sh                 :   Backup RDS/Aurora MySQL binlog to S3 bucket
+                                        Tested on MySQL 5.7
