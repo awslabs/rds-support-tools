@@ -25,14 +25,10 @@ import argparse
 import sys
 
 
-
-
-
 # Function to create the filter on the log which creates the metric
 def create_filter_and_metric(metric_name, filter_group_name, instance_name):
     print(' - metric: ' + metric_name)
-    client = (boto3.client('logs', region_name=region) if region else boto3.client('logs'))
-    client.put_metric_filter(
+    logs_client.put_metric_filter(
         logGroupName=filter_group_name,
         filterName=instance_name + '_' + metric_name,
         filterPattern=return_filter_pattern(),
@@ -46,14 +42,10 @@ def create_filter_and_metric(metric_name, filter_group_name, instance_name):
     )
 
 
-# This function gets the log group name from the RDS instance-
+# This function gets the log group name from the enhanced monitoring ARN
 def get_log_group_name(instance_name):
-    client = (boto3.client('rds', region_name=region) if region else boto3.client('rds'))
-    rds_instances = client.describe_db_instances()
-    for rds_instance in rds_instances['DBInstances']:
-        if rds_instance['DBInstanceIdentifier'] == instance_name:
-            log_group = rds_instance['EnhancedMonitoringResourceArn']
-            return log_group.split(':')[6]
+    enhanced_monitoring_arn = rds_instance['EnhancedMonitoringResourceArn']
+    return enhanced_monitoring_arn.split(':')[6]
 
 
 # This function returns a filter pattern based on the RDS instance id
@@ -63,31 +55,23 @@ def return_filter_pattern():
 
 # This function returns a line of the log to retrieve the fields
 def return_event_log_example():
-    client = (boto3.client('rds', region_name=region) if region else boto3.client('rds'))
-    rds_instance = client.describe_db_instances()
-    client = (boto3.client('logs', region_name=region) if region else boto3.client('logs'))
-    event_log_example = client.get_log_events(
-        logGroupName=get_log_group_name(rds_instance_name),
-        logStreamName=rds_instance['DBInstances'][0]['DbiResourceId'],
+    log_group_name = get_log_group_name(rds_instance_name)
+    example_log_streams = logs_client.describe_log_streams(
+        logGroupName=log_group_name,
+        limit=1
+    )
+    event_log_example = logs_client.get_log_events(
+        logGroupName=log_group_name,
+        logStreamName=example_log_streams['logStreams'][0]['logStreamName'],
         limit=1,
         startFromHead=True
     )
     return event_log_example
 
-
-# ensures that the instance exists.
-def does_this_rds_instance_exists(instance_name):
-    client = (boto3.client('rds', region_name=region) if region else boto3.client('rds'))
-    rds_instances = client.describe_db_instances()
-    for rds_instance in rds_instances['DBInstances']:
-        if rds_instance['DBInstanceIdentifier'] == instance_name:
-            return True
-    return False
-
-
 # Read a sample of the event log and selects which metrics are going to be populated with data
 # (some of them are string values and we don't populate them)
 def populate_metrics():
+    log_group_name = get_log_group_name(rds_instance_name)
     if not metrics_to_filter:
         json_data = json.loads(return_event_log_example()['events'][0]['message'])
         for item in json_data:
@@ -99,12 +83,18 @@ def populate_metrics():
                     subitem_list = json_data[item][0]
                 for subitem in subitem_list:
                     if not isinstance(subitem_list[subitem], str):
-                        create_filter_and_metric('$.' + item + '.' + subitem, get_log_group_name(rds_instance_name),
-                                                 rds_instance_name)
+                        create_filter_and_metric('$.' + item + '.' + subitem, log_group_name, rds_instance_name)
     else:
         for metric_to_filter in metrics_to_filter:
-            create_filter_and_metric('$.' + metric_to_filter, get_log_group_name(rds_instance_name), rds_instance_name)
+            create_filter_and_metric('$.' + metric_to_filter, log_group_name, rds_instance_name)
 
+# This function gets the RDS instance by instance identifier
+def get_rds_instance():
+    rds_instances = rds_client.describe_db_instances()
+    for rds_instance in rds_instances['DBInstances']:
+        if rds_instance_name == rds_instance['DBInstanceIdentifier']:
+            return rds_instance
+    return None
 
 # Main
 try:
@@ -112,7 +102,8 @@ try:
 except NameError:
     pass
 
-print('WARNING: This script will create additional resources in your AWS account such as custom metrics, which may result in additional charges. Do you wish to continue? Y/N')
+print('WARNING: This script will create additional resources in your AWS account such as custom metrics, ' + 
+        'which may result in additional charges. Do you wish to continue? Y/N')
 warning_choice = input('Do you understand and accept the above warning? yes/no: ').lower()
 if warning_choice != 'yes':
     print('To accept, you must type \"yes\". Please run the script again if you wish to proceed.')
@@ -137,24 +128,21 @@ metric_namespace = args.namespace
 region = args.region
 metrics_to_filter = args.metrics_to_filter
 
-if does_this_rds_instance_exists(rds_instance_name):
+logs_client = (boto3.client('logs', region_name=region) if region else boto3.client('logs'))
+rds_client = (boto3.client('rds', region_name=region) if region else boto3.client('rds'))
+
+rds_instance = get_rds_instance()
+if rds_instance:
     print
     print('Creating metrics')
     print(' for RDS instance: ' + rds_instance_name)
     print(' in this namespace: ' + metric_namespace)
-    try:
-        client = (boto3.client('rds', region_name=region) if region else boto3.client('rds'))
-        rds_instances = client.describe_db_instances()
-        for rds_instance in rds_instances['DBInstances']:
-            if rds_instance_name == rds_instance['DBInstanceIdentifier']:
-                log_group = rds_instance['EnhancedMonitoringResourceArn']
-    except Exception as e:
-        print('Error: ' + str(e))
-        print('The instance you selected doesn''t have Enhanced Monitoring activated.')
+    if 'EnhancedMonitoringResourceArn' not in rds_instance:
+        print('Error: The instance you selected doesn''t have Enhanced Monitoring activated')
         sys.exit(1)
     populate_metrics()
     print
-    print('All metrics  populated under:  > _<metric_name>')
+    print(f'All metrics  populated under: {metric_namespace}/{rds_instance_name}_<metric_name>')
 else:
     print('Error: The RDS instance you selected doesn''t exist on this region')
     sys.exit(1)
