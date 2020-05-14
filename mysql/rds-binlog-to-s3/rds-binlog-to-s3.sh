@@ -22,7 +22,7 @@ do
         `mysqlbinlog -u $master -h $RDS --read-from-remote-server $file --result-file=$Backup_dir/$file`
 done
 
-# Upload to S3 bucket: aws-tinglinc-logs
+# Upload to S3 bucket
 aws s3 sync $Backup_dir s3://$Bucket/binlog
 
 # Clean binlog on disk 1 day ago
