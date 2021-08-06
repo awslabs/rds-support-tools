@@ -19,7 +19,7 @@ do
                 mkdir $Backup_dir
         fi
         #remote read binlog
-        `mysqlbinlog -u $master -h $RDS --read-from-remote-server $file --result-file=$Backup_dir/$file`
+        `mysqlbinlog --raw -u $master -h $RDS --read-from-remote-server $file --result-file=$Backup_dir/$file`
 done
 
 # Upload to S3 bucket
