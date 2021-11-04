@@ -13,13 +13,34 @@
 * [List sessions that are blocking others](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-sessions-blocking-others.sql) 
 * [List tables and its bloat ratio](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-tables-bloated.sql)
 * [List indexes and its bloat ratio](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-btree-bloat.sql) 
+* [Top30 tables with low HOT updates ](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/top30-tables-with-low-hotupdates.sql)
+* [Set of scripts for periodically collecing activities (queries and objects stats](https://github.com/awslabs/rds-support-tools/tree/master/postgres/diag/stats_snapshot)
 
-## Shell scripts:
+## PostgreSQL Happiness hints:
 
-* [Catalog tables diagnostic script](https://github.com/awslabs/rds-support-tools/blob/master/postgres/diag/shell/postgresql-diagnostics.sh)
+* [https://ardentperf.com/happiness-hints/](https://ardentperf.com/happiness-hints/)
+
+
+## More tools:
+
+* [pgBadger / Postgres log parser and report generator](https://github.com/darold/pgbadger)
+* [pg-collector](https://github.com/awslabs/pg-collector)
+* [AWS PostgreSQL JDBC](https://github.com/awslabs/aws-postgresql-jdbc/)
+* [Stats Analyzer](https://github.com/samimseih/statsanalyzer/)
+* [ora2pg](https://github.com/darold/ora2pg)
+* [pg_partman](https://github.com/pgpartman/pg_partman)
+* [pg_cron](https://github.com/citusdata/pg_cron)
 
 ## RDS PostgreSQL public docs:
 
 * [PostgreSQL on Amazon RDS](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html)
 * [Common DBA Tasks for PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.html)
 
+## Connection poolers:
+
+* [pgBouncer](http://www.pgbouncer.org/)
+* [RDS Proxy](https://aws.amazon.com/rds/proxy/)
+
+## Other scripts:
+
+* [Catalog tables diagnostic script](https://github.com/awslabs/rds-support-tools/blob/master/postgres/diag/shell/postgresql-diagnostics.sh)
