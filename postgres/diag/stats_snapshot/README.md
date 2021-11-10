@@ -49,8 +49,10 @@ SELECT cron.schedule('*/5 * * * *', $$SELECT snapshot_stats('01_every_05min_gath
 ## Reports
 
 Reporting through views:
-   * All tables general (`pg_stat_all_tables`):  `vw_stat_all_tables_history`
+   * All tables (`pg_stat_all_tables`):  `vw_stat_all_tables_history`
+   * All indexes (`pg_stat_all_indexes`):  `vw_stat_all_indexes_history`
    * I/O (`pg_statio_all_tables`): `vw_statio_all_tables_history`
+   * I/O (`pg_statio_all_indexes`): `vw_statio_all_indexes_history`
    * Statements (`pg_stat_statements`): `vw_stat_statement_history`
 
    Notes:
