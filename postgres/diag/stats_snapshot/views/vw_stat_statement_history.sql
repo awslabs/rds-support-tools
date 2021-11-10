@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW vw_stat_stementment_history AS
+CREATE OR REPLACE VIEW vw_stat_statements_history AS
 WITH stat_history AS (
           SELECT  PSSH.*
                  ,PR.rolname as user_name
@@ -86,8 +86,8 @@ WITH stat_history AS (
                ,CASE WHEN (row_number() OVER w =1 )
                       THEN blk_write_time
                       ELSE coalesce((blk_write_time - lag(blk_write_time) OVER w),0)
-                  END AS blk_write_time
-               ,blk_read_time
+                  END AS blk_write_time_df
+               ,blk_write_time
 		  from stat_history
 		 WINDOW w AS (PARTITION BY queryid  ORDER BY date_trunc('minute', inserted_at))
  )
