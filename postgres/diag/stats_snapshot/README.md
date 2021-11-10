@@ -33,10 +33,12 @@
 ```
   SELECT snapshot_stats('00_project_label_001_initial-gather-stats');
 ```
+At any time run the function above to collect a new snapshot. The label can be modified for making easier to identify on which moment (or reasons) the snapshot was created.
+
 
 ## Automating the history statistics collection using pg_cron
 
-You can [learn more](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/PostgreSQL_pg_cron.html) about pg_cron on Aurora in our [public docs](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/PostgreSQL_pg_cron.html).
+pg_cron extension can be used to automated the gather of snapshots. You can [learn more](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/PostgreSQL_pg_cron.html) about pg_cron on Aurora in our [public docs](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/PostgreSQL_pg_cron.html).
 ```
 -- by default the pg_cron extension must be installed in the database defined by the parameter `cron.database_name`
 CREATE EXTENSION pg_cron;
