@@ -52,12 +52,12 @@ Reporting through views:
    * Statements (`pg_stat_statements`): `vw_stat_statement_history`
 
    Notes:
-    1. Columns that ends with `_df` is the difference between the time the collection was done (showed by the column `inserted_at` and the previous collection)
-    2. Columns that does not end with `_df` are the cumulative counters as they were at the moment when the collection was done.
+   *  1. Columns that ends with `_df` is the difference between the time the collection was done (showed by the column `inserted_at` and the previous collection)
+   *  2. Columns that does not end with `_df` are the cumulative counters as they were at the moment when the collection was done.
 
 
 ## Reseting cumulative postgres counters
     
-  Cumulative values for `pg_stat_statements` can be reset using executiong: `SELECT pg_stat_statements_reset();`. Read more details about this function and its variations ![here](https://www.postgresql.org/docs/current/pgstatstatements.html#id-1.11.7.39.8.2.1.1.2).
-  For views such `pg_stat_all_tables`, `pg_statio_all_tables`, etc. the cumulative counters can be reset by calling: `SELECT pg_stat_reset();`. Variations also in Postgres docs ![here](https://www.postgresql.org/docs/current/monitoring-stats.html#id-1.6.15.7.26.4.2.2.5.1.1.1).
+  * Cumulative values for `pg_stat_statements` can be reset using executiong: `SELECT pg_stat_statements_reset();`. Read more details about this function and its variations ![here](https://www.postgresql.org/docs/current/pgstatstatements.html#id-1.11.7.39.8.2.1.1.2).
+  * For views such `pg_stat_all_tables`, `pg_statio_all_tables`, etc. the cumulative counters can be reset by calling: `SELECT pg_stat_reset();`. Variations also in Postgres docs ![here](https://www.postgresql.org/docs/current/monitoring-stats.html#id-1.6.15.7.26.4.2.2.5.1.1.1).
 
