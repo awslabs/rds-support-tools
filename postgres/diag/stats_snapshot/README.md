@@ -60,6 +60,6 @@ Reporting through views:
 
 ## Reseting cumulative postgres counters
     
-  * Cumulative values for `pg_stat_statements` can be reset using executiong: `SELECT pg_stat_statements_reset();`. Read more details about this function and its variations ![here](https://www.postgresql.org/docs/current/pgstatstatements.html#id-1.11.7.39.8.2.1.1.2).
-  * For views such `pg_stat_all_tables`, `pg_statio_all_tables`, etc. the cumulative counters can be reset by calling: `SELECT pg_stat_reset();`. Variations also in Postgres docs ![here](https://www.postgresql.org/docs/current/monitoring-stats.html#id-1.6.15.7.26.4.2.2.5.1.1.1).
+  * Cumulative values for `pg_stat_statements` can be reset using executiong: `SELECT pg_stat_statements_reset();`. Read more details about this function and its variations [here](https://www.postgresql.org/docs/current/pgstatstatements.html#id-1.11.7.39.8.2.1.1.2).
+  * For views such `pg_stat_all_tables`, `pg_statio_all_tables`, etc. the cumulative counters can be reset by calling: `SELECT pg_stat_reset();`. Variations also in Postgres docs [here](https://www.postgresql.org/docs/current/monitoring-stats.html#id-1.6.15.7.26.4.2.2.5.1.1.1).
 
