@@ -65,3 +65,13 @@ Reporting through views:
   * Cumulative values for `pg_stat_statements` can be reset using executiong: `SELECT pg_stat_statements_reset();`. Read more details about this function and its variations [here](https://www.postgresql.org/docs/current/pgstatstatements.html#id-1.11.7.39.8.2.1.1.2).
   * For views such `pg_stat_all_tables`, `pg_statio_all_tables`, etc. the cumulative counters can be reset by calling: `SELECT pg_stat_reset();`. Variations also in Postgres docs [here](https://www.postgresql.org/docs/current/monitoring-stats.html#id-1.6.15.7.26.4.2.2.5.1.1.1).
 
+
+## Helpful links:
+  * [Reducing Aurora PostgreSQL storage I/O costs](https://aws.amazon.com/blogs/database/reducing-aurora-postgresql-storage-i-o-costs/)
+  * [Amazon Aurora Pricing](https://aws.amazon.com/rds/aurora/pricing/)
+  * [awslabs/amazon-aurora-postgres-monitoring](https://github.com/awslabs/amazon-aurora-postgres-monitoring)
+  * [samimseih/statsanalyzer](https://github.com/samimseih/statsanalyzer/)
+  * [awslabs/pg-collector](https://github.com/awslabs/pg-collector)
+  * [PostgreSQL Wiki / Monitoring](https://wiki.postgresql.org/wiki/Monitoring)
+  * [PostgreSQL / Docs / Monitoring Stats](https://www.postgresql.org/docs/current/monitoring-stats.html)
+
