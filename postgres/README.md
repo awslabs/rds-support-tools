@@ -6,15 +6,15 @@
 
 ## SQL Scripts: 
 
-* [List ROLES (i.e. users and groups)](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-roles.sql) 
-* [List pg_stat_actitivy roles / showing the status of each connection](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-sessions.sql)
-* [List tables with dead tuples](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-tables-with-dead-tuples.sql)
-* [List tables and its ages](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-tables-age.sql)
-* [List sessions that are blocking others](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-sessions-blocking-others.sql) 
-* [List tables and its bloat ratio](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-tables-bloated.sql)
-* [List indexes and its bloat ratio](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/list-btree-bloat.sql) 
-* [Top30 tables with low HOT updates ](https://raw.githubusercontent.com/awslabs/rds-support-tools/master/postgres/diag/sql/top30-tables-with-low-hotupdates.sql)
-* [Set of scripts for periodically collecing activities (queries and objects stats](https://github.com/awslabs/rds-support-tools/tree/master/postgres/diag/stats_snapshot)
+* [List ROLES (i.e. users and groups)](https://raw.githubusercontent.com/awslabs/rds-support-tools/main/postgres/diag/sql/list-roles.sql) 
+* [List pg_stat_actitivy roles / showing the status of each connection](https://raw.githubusercontent.com/awslabs/rds-support-tools/main/postgres/diag/sql/list-sessions.sql)
+* [List tables with dead tuples](https://raw.githubusercontent.com/awslabs/rds-support-tools/main/postgres/diag/sql/list-tables-with-dead-tuples.sql)
+* [List tables and its ages](https://raw.githubusercontent.com/awslabs/rds-support-tools/main/postgres/diag/sql/list-tables-age.sql)
+* [List sessions that are blocking others](https://raw.githubusercontent.com/awslabs/rds-support-tools/main/postgres/diag/sql/list-sessions-blocking-others.sql) 
+* [List tables and its bloat ratio](https://raw.githubusercontent.com/awslabs/rds-support-tools/main/postgres/diag/sql/list-tables-bloated.sql)
+* [List indexes and its bloat ratio](https://raw.githubusercontent.com/awslabs/rds-support-tools/main/postgres/diag/sql/list-btree-bloat.sql) 
+* [Top30 tables with low HOT updates ](https://raw.githubusercontent.com/awslabs/rds-support-tools/main/postgres/diag/sql/top30-tables-with-low-hotupdates.sql)
+* [Set of scripts for periodically collecting activities (queries and objects stats)](https://github.com/awslabs/rds-support-tools/tree/main/postgres/diag/stats_snapshot)
 
 ## PostgreSQL Happiness hints:
 
@@ -43,4 +43,4 @@
 
 ## Other scripts:
 
-* [Catalog tables diagnostic script](https://github.com/awslabs/rds-support-tools/blob/master/postgres/diag/shell/postgresql-diagnostics.sh)
+* [Catalog tables diagnostic script](https://github.com/awslabs/rds-support-tools/blob/main/postgres/diag/shell/postgresql-diagnostics.sh)

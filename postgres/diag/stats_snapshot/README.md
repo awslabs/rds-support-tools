@@ -20,8 +20,8 @@
 ```
   export PGHOST="<RDS DB instance endpoint>"
   export PGDATABASE="<the database you want to track>"
-  export PGUSER="<RDS DB instance master user>"
-  export PGPASSWORD="<master user password>"
+  export PGUSER="<RDS DB instance db user>"
+  export PGPASSWORD="<db user password>"
   export PGPORT="5432"
   psql -f setup.sql
   psql -f views/vw_stat_all_tables_history.sql
