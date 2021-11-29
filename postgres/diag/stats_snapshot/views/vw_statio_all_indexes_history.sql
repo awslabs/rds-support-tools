@@ -2,7 +2,6 @@ CREATE OR REPLACE VIEW vw_statio_all_indexes_history AS
 WITH stat_history AS (
           SELECT  PSAIH.*
             FROM  pg_statio_all_indexes_history PSAIH
-           where PSAIH.schemaname !~  'pg_catalog'  and PSAIH.schemaname !~  'pg_toast' 
   ),  stat_window AS (
 		select  row_number() OVER w as row_pos
                ,relid
