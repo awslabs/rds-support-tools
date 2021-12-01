@@ -18,12 +18,17 @@
 
 ## Installing:
 ```
+  git clone https://github.com/awslabs/rds-support-tools.git
+  cd rds-support-tools/postgres/diag/stats_snapshot
+  
   export PGHOST="<RDS DB instance endpoint>"
   export PGDATABASE="<the database you want to track>"
   export PGUSER="<RDS DB instance db user>"
   export PGPASSWORD="<db user password>"
   export PGPORT="5432"
+  
   psql -f setup.sql
+  
   psql -f views/vw_stat_all_tables_history.sql
   psql -f views/vw_stat_all_indexes_history.sql
   psql -f views/vw_statio_all_tables_history.sql
@@ -31,11 +36,14 @@
   psql -f views/vw_stat_statement_history.sql
 ```
 
-## Testing the gather and collecting the first snapshot stats:
+## Gather and collecting stats snapshots:
 ```
   SELECT snapshot_stats('00_project_label_001_initial-gather-stats');
 ```
-At any time run the function above to collect a new snapshot. The label can be modified for making easier to identify on which moment (or reasons) the snapshot was created.
+At any time run the function above to collect a new snapshot. 
+The label can be modified to any value, for making easier to identify on which moment (or reasons) the snapshot was created.
+Having at least 3 collections would be important to understand the workload pattern and how it reflects on objects. Those collections should be done, 
+before the workload starts, during the workload run and after the workload has being executed. Another way is to automate the snapshots gather periodically via cron.  
 
 
 ## Automating the history statistics collection using pg_cron
