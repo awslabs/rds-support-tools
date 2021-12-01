@@ -25,7 +25,9 @@
   export PGPORT="5432"
   psql -f setup.sql
   psql -f views/vw_stat_all_tables_history.sql
+  psql -f views/vw_stat_all_indexes_history.sql
   psql -f views/vw_statio_all_tables_history.sql
+  psql -f views/vw_statio_all_indexes_history.sql
   psql -f views/vw_stat_statement_history.sql
 ```
 
