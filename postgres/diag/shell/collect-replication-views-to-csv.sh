@@ -19,3 +19,4 @@ psql_cmd=`whereis psql`
 $psql_cmd -t --csv -f ../sql/repl-session.sql  >> repl-session.log  2>&1 & 
 $psql_cmd -t --csv -f ../sql/repl-slots.sql  >> repl-slots.log  2>&1 & 
 $psql_cmd -t --csv -f ../sql/repl-wal-receiver.sql   >> repl-wal-receiver.log  2>&1 & 
+$psql_cmd -t --csv -f ../sql/repl-xmin-from-activity.sql   >> repl-xmin-from-activity.log  2>&1 & 
