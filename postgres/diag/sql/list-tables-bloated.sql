@@ -1,5 +1,9 @@
 /* WARNING: executed with a non-superuser role, the query inspect only tables you are granted to read.
 * This query is compatible with PostgreSQL 9.0 and more
+* 
+*  Change: removed 'tbl.relhasoids' as they are not special columns anymore
+*          based on https://postgresql.verite.pro/blog/2019/04/24/oid-column.html
+*
 */
 SELECT current_database(), schemaname, tblname, bs*tblpages AS real_size,
   (tblpages-est_tblpages)*bs AS extra_size,
@@ -11,12 +15,12 @@ SELECT current_database(), schemaname, tblname, bs*tblpages AS real_size,
     THEN 100 * (tblpages - est_tblpages_ff)/tblpages::float
     ELSE 0
   END AS bloat_ratio, is_na
-  -- , (pst).free_percent + (pst).dead_tuple_percent AS real_frag
+
 FROM (
   SELECT ceil( reltuples / ( (bs-page_hdr)/tpl_size ) ) + ceil( toasttuples / 4 ) AS est_tblpages,
     ceil( reltuples / ( (bs-page_hdr)*fillfactor/(tpl_size*100) ) ) + ceil( toasttuples / 4 ) AS est_tblpages_ff,
     tblpages, fillfactor, bs, tblid, schemaname, tblname, heappages, toastpages, is_na
-    -- , stattuple.pgstattuple(tblid) AS pst
+
   FROM (
     SELECT
       ( 4 + tpl_hdr_size + tpl_data_size + (2*ma)
@@ -36,7 +40,7 @@ FROM (
         CASE WHEN version()~'mingw32' OR version()~'64-bit|x86_64|ppc64|ia64|amd64' THEN 8 ELSE 4 END AS ma,
         24 AS page_hdr,
         23 + CASE WHEN MAX(coalesce(null_frac,0)) > 0 THEN ( 7 + count(*) ) / 8 ELSE 0::int END
-          + CASE WHEN tbl.relhasoids THEN 4 ELSE 0 END AS tpl_hdr_size,
+          AS tpl_hdr_size,
         sum( (1-coalesce(s.null_frac, 0)) * coalesce(s.avg_width, 1024) ) AS tpl_data_size,
         bool_or(att.atttypid = 'pg_catalog.name'::regtype)
           OR count(att.attname) <> count(s.attname) AS is_na
@@ -48,11 +52,12 @@ FROM (
         LEFT JOIN pg_class AS toast ON tbl.reltoastrelid = toast.oid
       WHERE att.attnum > 0 AND NOT att.attisdropped
         AND tbl.relkind = 'r'
-      GROUP BY 1,2,3,4,5,6,7,8,9,10, tbl.relhasoids
+      GROUP BY 1,2,3,4,5,6,7,8,9,10
       ORDER BY 2,3
     ) AS s
   ) AS s2
 ) AS s3 ;
+
 -- WHERE NOT is_na
 --   AND tblpages*((pst).free_percent + (pst).dead_tuple_percent)::float4/100 >= 1
 
