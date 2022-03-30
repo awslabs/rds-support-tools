@@ -88,16 +88,12 @@ WITH report AS (
        ) AS s3
  ORDER BY bloat_size DESC
 )
-SELECT * FROM report WHERE bloat_ratio != 0;
-
-
-
-
-
-
-
-
-
+  SELECT * 
+    FROM report 
+   WHERE bloat_ratio != 0
+ -- AND schemaname = 'public'
+ -- AND tblname = 'pgbench_accounts'
+;
 
 
 -- WHERE NOT is_na
