@@ -1,0 +1,65 @@
+{
+  "name": "pg-upgrade-construct",
+  "version": "0.1.0",
+  "main": "build/lib/index.js",
+  "types": "build/lib/index.d.ts",
+  "scripts": {
+    "build": "eslint . --fix && jsii",
+    "test": "jest && cdk synth --app='npx ts-node test/integ.ts'",
+    "nag": "cdk synth --app='npx ts-node test/nag.ts'",
+    "integ": "cdk synth --app='npx ts-node test/integ.ts'",
+    "package": "jsii-pacmak"
+  },
+  "author": {
+    "name": "Eric Beard",
+    "email": "ezbeard@amazon.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "url": "http://example.com",
+    "type": "git"
+  },
+  "jsii": {
+    "outdir": "dist",
+    "targets": {
+      "python": {
+        "distName": "pg-upgrade-construct",
+        "module": "pg-upgrade-construct"
+      }
+    },
+    "tsc": {
+      "exclude": [
+        "node_modules",
+        "cdk.out",
+        "build"
+      ],
+      "outDir": "build"
+    },
+    "excludeTypescript": [
+      "cdk.out/**/*.ts"
+    ]
+  },
+  "devDependencies": {
+    "@types/jest": "^27.5.2",
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.4",
+    "aws-cdk": "2.33.0",
+    "ts-node": "^10.9.1",
+    "typescript": "~3.9.7",
+    "@types/node": "10.17.27",
+    "@types/prettier": "2.6.0",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "aws-cdk-lib": "2.33.0",
+    "cdk-nag": "^2.15.20",
+    "constructs": "10.0.5",
+    "eslint": "^8.17.0",
+    "jsii": "^1.62.0",
+    "jsii-pacmak": "^1.62.0",
+    "jsii-release": "^0.2.417"
+  },
+  "peerDependencies": {
+    "aws-cdk-lib": "^2.33.0",
+    "constructs": "^10.0.5"
+  }
+}
