@@ -7,7 +7,7 @@ AWS_PATH=/opt/aws
 Backup_dir=/home/ec2-user/backup/binlog/$(date "+%Y-%m-%d")
 Bucket='rds-binlogs'
 RDS='mysql57.xxxxxxxxxx.us-west-2.rds.amazonaws.com'
-master='admin'
+dbuser='admin'
 export MYSQL_PWD='test1234'
 
 # Converting to array — the last binary log may still be actively written
@@ -22,7 +22,7 @@ do
                 mkdir $Backup_dir
         fi
         #remote read binlog
-        `mysqlbinlog -u $master -h $RDS --read-from-remote-server $file --result-file=$Backup_dir/$file`
+        `mysqlbinlog -u $dbuser -h $RDS --read-from-remote-server $file --result-file=$Backup_dir/$file`
 done
 
 # Upload to S3 bucket
