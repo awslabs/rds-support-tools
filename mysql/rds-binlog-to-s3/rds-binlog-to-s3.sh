@@ -10,9 +10,12 @@ RDS='mysql57.xxxxxxxxxx.us-west-2.rds.amazonaws.com'
 master='admin'
 export MYSQL_PWD='test1234'
 
-mysql_binlog_filename=$(mysql -u $master -h $RDS -e "show master logs"|grep "mysql-bin"|awk '{print $1}')
+# Converting to array — the last binary log may still be actively written
+# to by the master, so we exclude it to avoid downloading incomplete data.
+# See: https://github.com/awslabs/rds-support-tools/issues/84
+mysql_binlog_filename=($(mysql -u $master -h $RDS -e "show master logs"|grep "mysql-bin"|awk '{print $1}'))
 
-for file in $mysql_binlog_filename
+for file in ${mysql_binlog_filename[@]::${#mysql_binlog_filename[@]}-1}
 do
         if ! test -d $Backup_dir
         then
