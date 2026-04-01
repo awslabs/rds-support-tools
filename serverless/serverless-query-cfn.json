@@ -87,7 +87,7 @@
              "S3Bucket": {"Ref": "PS3Bucket"},
              "S3Key": "serverless-query.zip"
           },
-          "Runtime": "python3.6",
+          "Runtime": "python3.9",
           "VpcConfig": {
              "SubnetIds":[{"Ref": "PSubnetIds"}],
              "SecurityGroupIds":[{"Ref": "PSecurityGroupIds"}]
