@@ -56,6 +56,11 @@ postgresql-diagnostics.sh           :   Bash script that can be added to a cront
                                         Calls are made to the instance directly to execute SQL commands and output is redirected to output file
                                         Requires endpoint, role and database to be passed as execution parameters
 
+pg-major-version-upgrade-precheck.sh    :   Aurora/RDS PostgreSQL Major Version Upgrade Pre-check Tool.
+                                            Validates database configuration and identifies potential compatibility issues before performing a major version upgrade.
+                                            Detects incompatibilities and Blue/Green Deployments issues early, helping resolve 80-90% of upgrade problems before testing begins.
+                                            Requires endpoint, port, user and TargetVersion to be passed as execution parameters
+                                            Tested on RDS PostgreSQL 11-17, Aurora PostgreSQL 11-17
 
 
 #####################################
