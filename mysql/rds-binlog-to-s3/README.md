@@ -63,7 +63,7 @@ crontab -e
 ```
 RDS MySQL Instance
        │
-       │  SHOW MASTER LOGS
+       │  SHOW BINARY LOGS
        ▼
   List binary log files
   (exclude last — may be incomplete)
