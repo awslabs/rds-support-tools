@@ -25,10 +25,12 @@ RDS='mysql57.xxxxxxxxxx.us-west-2.rds.amazonaws.com'
 dbuser='admin'
 export MYSQL_PWD='test1234'
 
-# Converting to array — the last binary log may still be actively written
-# to by the master, so we exclude it to avoid downloading incomplete data.
+# "SHOW MASTER LOGS" was removed in MySQL 8.4. Use "SHOW BINARY LOGS" which
+# works on MySQL 5.7+ and is the only option for 8.4+.
+# The last binary log may still be actively written to by the master,
+# so we exclude it to avoid downloading incomplete data.
 # See: https://github.com/awslabs/rds-support-tools/issues/84
-mysql_binlog_filename=($(mysql -u $master -h $RDS -e "show master logs"|grep "mysql-bin"|awk '{print $1}'))
+mysql_binlog_filename=($(mysql -u $master -h $RDS -e "SHOW BINARY LOGS"|grep "mysql-bin"|awk '{print $1}'))
 
 for file in ${mysql_binlog_filename[@]::${#mysql_binlog_filename[@]}-1}
 do
