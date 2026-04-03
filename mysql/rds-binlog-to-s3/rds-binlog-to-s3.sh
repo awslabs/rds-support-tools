@@ -1,5 +1,20 @@
 #!/bin/bash
 #
+#  Copyright 2016 Amazon.com, Inc. or its affiliates.
+#  All Rights Reserved.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License").
+#  You may not use this file except in compliance with the License.
+#  A copy of the License is located at
+#
+#      http://aws.amazon.com/apache2.0/
+#
+#  or in the "license" file accompanying this file.
+#  This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+#  CONDITIONS OF ANY KIND, either express or implied. See the License
+#  for the specific language governing permissions and limitations
+#  under the License.
+#
 #Script to download RDS MySQL binlog files using mysqlbinlog command and the AWS CLI tools to upload them to S3.
 #Install AWS CLI tools see: "http://docs.aws.amazon.com/cli/latest/userguide/installing.html"
 #Config your AWS config File (aws configure)
@@ -10,9 +25,14 @@ RDS='mysql57.xxxxxxxxxx.us-west-2.rds.amazonaws.com'
 dbuser='admin'
 export MYSQL_PWD='test1234'
 
-mysql_binlog_filename=$(mysql -u $dbuser -h $RDS -e "show master logs"|grep "mysql-bin"|awk '{print $1}')
+# "SHOW MASTER LOGS" was removed in MySQL 8.4. Use "SHOW BINARY LOGS" which
+# works on MySQL 5.7+ and is the only option for 8.4+.
+# The last binary log may still be actively written to by the master,
+# so we exclude it to avoid downloading incomplete data.
+# See: https://github.com/awslabs/rds-support-tools/issues/84
+mysql_binlog_filename=($(mysql -u $master -h $RDS -e "SHOW BINARY LOGS"|grep "mysql-bin"|awk '{print $1}'))
 
-for file in $mysql_binlog_filename
+for file in ${mysql_binlog_filename[@]::${#mysql_binlog_filename[@]}-1}
 do
         if ! test -d $Backup_dir
         then
