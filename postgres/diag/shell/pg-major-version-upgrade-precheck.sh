@@ -1964,8 +1964,17 @@ ${db_result}
         status="WARNING"
     fi
 
-    # Informational checks are always INFO regardless of row count, but preserve ERROR
+    # Critical upgrade blockers should be ERROR, not WARNING, when issues are found
     local base_check="${check_name%% - what to check:*}"
+    case "${base_check}" in
+        "chkpass Extension Check"|"tsearch2 Extension Check"|"pg_repack Extension Check"|"System-Defined Composite Types in User Tables"|"aclitem Data Type Check (PostgreSQL 16+ Incompatibility)"|"sql_identifier Data Type Check (PostgreSQL 12+ Incompatibility)"|"Removed Data Types Check (abstime, reltime, tinterval)"|"Tables WITH OIDS Check"|"User-Defined Encoding Conversions Check"|"User-Defined Postfix Operators Check"|"Incompatible Polymorphic Functions Check"|"reg* Data Types in User Tables Check"|"Database Connection Settings Check")
+            if [ "${status}" = "WARNING" ]; then
+                status="ERROR"
+            fi
+            ;;
+    esac
+
+    # Informational checks are always INFO regardless of row count, but preserve ERROR
     case "${base_check}" in
         "Object Count Check"|"Top 20 Largest Tables"|"Unused Indexes Analysis"|"Schema Usage")
             if [ "${status}" != "ERROR" ]; then
@@ -4256,7 +4265,7 @@ check_invalid_databases() {
         fi
     fi
     
-    add_check_result "${output_file}" "${check_name}" "${check_description}" "${result}" "${status}" "${check_id}"
+    write_check_result "${output_file}" "${check_name}" "${check_description}" "${result}" "${status}" "${check_id}"
 }
 
 ################################################################################
@@ -4294,7 +4303,7 @@ check_database_age() {
         fi
     fi
     
-    add_check_result "${output_file}" "${check_name}" "${check_description}" "${result}" "${status}" "${check_id}"
+    write_check_result "${output_file}" "${check_name}" "${check_description}" "${result}" "${status}" "${check_id}"
 }
 
 ################################################################################
@@ -4420,13 +4429,24 @@ execute_check() {
                 fi
                 ;;
             
-            "Large Objects Check"|"Replication Slots Check"|"Uncommitted Prepared Transactions"|"Unsupported Data Types Check (reg* Types)"|"Unknown Data Type Check (PostgreSQL 9.6 → 10+)"|"Views Dependent on System Catalogs")
+            "Large Objects Check"|"Unknown Data Type Check (PostgreSQL 9.6 → 10+)"|"Views Dependent on System Catalogs")
                 # These checks return a count in the first query
                 # Extract the numeric value from the first result
                 local count_value
                 count_value=$(echo "${first_result}" | grep -E "^[[:space:]]*[0-9]+[[:space:]]*$" | tr -d ' ')
                 if [ -n "$count_value" ] && [ "$count_value" -gt 0 ]; then
                     status="WARNING"
+                else
+                    status="SUCCESS"
+                fi
+                ;;
+            
+            "Replication Slots Check"|"Uncommitted Prepared Transactions"|"Unsupported Data Types Check (reg* Types)")
+                # These are upgrade blockers — ERROR if count > 0
+                local count_value
+                count_value=$(echo "${first_result}" | grep -E "^[[:space:]]*[0-9]+[[:space:]]*$" | tr -d ' ')
+                if [ -n "$count_value" ] && [ "$count_value" -gt 0 ]; then
+                    status="ERROR"
                 else
                     status="SUCCESS"
                 fi
@@ -4477,10 +4497,19 @@ execute_check() {
                 fi
                 ;;
             
-            "Invalid Indexes Check"|"Duplicate Indexes Detection"|"Table Bloat Analysis"|"Active Long Running Queries"|"Installed Extensions"|"Parameter Permissions Check"|"Table Requirements for Blue/Green Deployments"|"chkpass Extension Check"|"tsearch2 Extension Check"|"pg_repack Extension Check"|"System-Defined Composite Types in User Tables"|"aclitem Data Type Check (PostgreSQL 16+ Incompatibility)"|"sql_identifier Data Type Check (PostgreSQL 12+ Incompatibility)"|"Removed Data Types Check (abstime, reltime, tinterval)"|"Tables WITH OIDS Check"|"User-Defined Encoding Conversions Check"|"User-Defined Postfix Operators Check"|"Incompatible Polymorphic Functions Check"|"Outdated Extension Versions Check")
+            "Invalid Indexes Check"|"Duplicate Indexes Detection"|"Table Bloat Analysis"|"Active Long Running Queries"|"Installed Extensions"|"Parameter Permissions Check"|"Table Requirements for Blue/Green Deployments"|"Outdated Extension Versions Check")
                 # Warning if more than 0 rows, Success if 0 rows
                 if [ "$row_count" -gt 0 ]; then
                     status="WARNING"
+                else
+                    status="SUCCESS"
+                fi
+                ;;
+            
+            "chkpass Extension Check"|"tsearch2 Extension Check"|"pg_repack Extension Check"|"System-Defined Composite Types in User Tables"|"aclitem Data Type Check (PostgreSQL 16+ Incompatibility)"|"sql_identifier Data Type Check (PostgreSQL 12+ Incompatibility)"|"Removed Data Types Check (abstime, reltime, tinterval)"|"Tables WITH OIDS Check"|"User-Defined Encoding Conversions Check"|"User-Defined Postfix Operators Check"|"Incompatible Polymorphic Functions Check")
+                # These are critical upgrade blockers — ERROR if found
+                if [ "$row_count" -gt 0 ]; then
+                    status="ERROR"
                 else
                     status="SUCCESS"
                 fi
@@ -4675,11 +4704,13 @@ EOF
             detect_engine_type
         fi
         
-        # Add RDS configuration
-        add_rds_config "${output_file}"
+        # Add RDS configuration (HTML only — text mode gets the section header only)
+        if [ "${REPORT_FORMAT}" != "text" ]; then
+            add_rds_config "${output_file}"
         
-        # Add Memory and Storage Status
-        add_memory_storage_status "${output_file}"
+            # Add Memory and Storage Status
+            add_memory_storage_status "${output_file}"
+        fi
     fi
     
     # Handle SQL mode
@@ -5589,7 +5620,7 @@ Details: ${upgrade_targets}"
         fi
         
         # Add the check result using standard function
-        add_check_result "${output_file}" "Version Compatibility and Upgrade Path" "Valid upgrade targets for current version" "${version_check_result}" "${version_check_status}" "24"
+        write_check_result "${output_file}" "Version Compatibility and Upgrade Path" "Valid upgrade targets for current version" "${version_check_result}" "${version_check_status}" "24"
         
         # Check 25: Parameter Group Configuration for Blue/Green
         execute_check \
