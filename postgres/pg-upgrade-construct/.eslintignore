@@ -1,0 +1,10 @@
+build/*
+.eslintrc.js
+jest.config.js
+webpack.config.js
+lambda/dist/*
+lambda/node_modules/*
+cdk.out/*
+test/build/*
+dist/
+lambda

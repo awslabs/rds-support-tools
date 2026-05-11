@@ -1,0 +1,21 @@
+{
+  "name": "pg-upgrade",
+  "version": "0.1.6",
+  "description": "Postgreqsl Schema Upgrade",
+  "homepage": "https://github.com/awslabs/rds-support-tools/tree/main/postgres/pg-upgrade-js",
+  "main": "upgrade.js",
+  "bin": {
+    "pg-upgrade": "./upgrade.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^9.3.0",
+    "fs-extra": "^10.1.0",
+    "pg": "^8.7.3",
+    "pgpass": "^1.0.5"
+  }
+}
