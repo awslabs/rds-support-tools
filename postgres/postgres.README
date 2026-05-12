@@ -56,12 +56,72 @@ postgresql-diagnostics.sh           :   Bash script that can be added to a cront
                                         Calls are made to the instance directly to execute SQL commands and output is redirected to output file
                                         Requires endpoint, role and database to be passed as execution parameters
 
-pg-major-version-upgrade-precheck.sh    :   Aurora/RDS PostgreSQL Major Version Upgrade Pre-check Tool.
-                                            Validates database configuration and identifies potential compatibility issues before performing a major version upgrade.
-                                            Detects incompatibilities and Blue/Green Deployments issues early, helping resolve 80-90% of upgrade problems before testing begins.
-                                            Requires endpoint, port, user and TargetVersion to be passed as execution parameters
-                                            Tested on RDS PostgreSQL 11-17, Aurora PostgreSQL 11-17
+##########################################################################
+rds-support-tools/postgres/diag/shell/pg-major-version-upgrade-precheck-tool
+##########################################################################
 
+pg-major-version-upgrade-precheck.sh            :   Aurora/RDS PostgreSQL Major Version Upgrade Pre-check Script.
+                                        Performs 48 comprehensive checks across all databases in a cluster
+                                        to validate upgrade readiness before a major version upgrade.
+
+                                        Features:
+                                        - 23 standard pre-upgrade checks (always executed)
+                                        - 13 Blue/Green deployment checks (optional, with --blue-green flag)
+                                        - 12 critical upgrade blocker checks (always executed, version-conditional)
+                                        - Cross-database iteration for extension, data type, and compatibility checks
+                                        - Instance-wide max_locks_per_transaction calculation with 20% safety buffer
+                                        - HTML or plain text report output (--format html|text)
+                                        - AWS Secrets Manager support for password retrieval
+                                        - Input validation with re-prompt loops in interactive mode
+                                        - RDS/Aurora configuration and CloudWatch metrics analysis
+
+                                        Usage (interactive):
+                                            bash pg-major-version-upgrade-precheck.sh
+
+                                        Usage (non-interactive):
+                                            bash pg-major-version-upgrade-precheck.sh --non-interactive -m sql \
+                                                -h <endpoint> -P <port> -d <database> -u <user> -w <password>
+
+                                            bash pg-major-version-upgrade-precheck.sh --non-interactive --blue-green -m both \
+                                                -r <region> -i <identifier> -p <profile> \
+                                                -h <endpoint> -P <port> -d <database> -u <user> -s <secret-arn>
+
+                                        Output:
+                                            rds_precheck_report_<identifier>_<timestamp>.html (or .txt)
+
+                                        Prerequisites:
+                                            bash 4.0+, psql, aws cli (for RDS mode), jq
+
+                                        Tested on RDS PostgreSQL 11-17, Aurora PostgreSQL 11-17
+
+wrapper.sh                          :   Batch execution wrapper for pg-major-version-upgrade-precheck.sh.
+                                        Runs pre-upgrade checks against multiple PostgreSQL databases
+                                        defined in a CSV file.
+
+                                        Features:
+                                        - Auto-discovers RDS/Aurora instances in a region (Option 1)
+                                        - Executes checks for all instances in CSV (Option 2)
+                                        - Supports direct passwords and AWS Secrets Manager
+                                        - Per-instance Blue/Green mode and report format selection
+                                        - Password masking in console output
+                                        - Graceful error handling with batch summary
+                                        - Windows CRLF line ending support
+
+                                        Usage:
+                                            bash wrapper.sh
+
+                                        CSV Format:
+                                            mode,region,identifier,profile,host,port,database,username,
+                                            password,secret_arn,secret_key,baseline,engine,blue_green,format
+
+                                        Output:
+                                            HTML/text reports per instance + batch execution summary
+
+                                        Prerequisites:
+                                            bash 4.0+, psql, aws cli, jq
+                                            pg-major-version-upgrade-precheck.sh in the same directory
+
+                                        Tested on RDS PostgreSQL 11-17, Aurora PostgreSQL 11-17
 
 #####################################
 rds-support-tools/postgres/diag/proc
