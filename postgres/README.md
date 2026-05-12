@@ -20,7 +20,6 @@
 
 * [https://ardentperf.com/happiness-hints/](https://ardentperf.com/happiness-hints/)
 
-
 ## More tools:
 
 * [pgBadger / Postgres log parser and report generator](https://github.com/darold/pgbadger)
@@ -40,6 +39,10 @@
 
 * [pgBouncer](http://www.pgbouncer.org/)
 * [RDS Proxy](https://aws.amazon.com/rds/proxy/)
+
+## Aurora/RDS PostgreSQL Major Version Upgrade Pre-check Tool:
+* [Shell Version](https://github.com/nickyhsu-aws/rds-support-tools/tree/main/postgres/diag/shell/pg-major-version-upgrade-precheck-tool)
+* [SQL & PL/pgSQL Versions](https://github.com/nickyhsu-aws/rds-support-tools/tree/main/postgres/diag/sql/pg-major-version-upgrade-precheck-tool)
 
 ## Other scripts:
 
