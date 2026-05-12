@@ -6,12 +6,11 @@ Supported target versions: PostgreSQL 11 – 17
 
 > **Note:** These SQL scripts must be executed against each database individually. If you need automated execution across all databases in a cluster, use the [shell script version](https://github.com/awslabs/rds-support-tools/tree/main/postgres/diag/shell/pg-major-version-upgrade-precheck-tool) which iterates all user databases automatically.
 
-## Two Versions Provided
+## SQL Version Provided
 
 | File | Type | How to Run |
 |------|------|------------|
 | `pg-major-version-upgrade-precheck-sql.sql` | SQL (psql meta-commands) | Execute via `psql` |
-| `pg-major-version-upgrade-precheck-plpgsql.sql` | PL/pgSQL function | Call with `SELECT` from any PostgreSQL client |
 
 ## Check Overview
 
@@ -40,27 +39,6 @@ psql "host=<HOST> port=<PORT> user=<USER> dbname=postgres sslmode=verify-full ss
 # Per-database checks (run against each user database)
 psql "host=<HOST> port=<PORT> user=<USER> dbname=<DBNAME> sslmode=verify-full sslrootcert=global-bundle.pem" \
      -v target_version=16 -f pg-major-version-upgrade-precheck-sql.sql
-```
-
-### PL/pgSQL Version
-
-Execute the SQL file once to create the function, then call it with `SELECT`:
-
-```bash
-# Step 1: Load the function
-psql "host=<HOST> port=<PORT> user=<USER> dbname=postgres sslmode=verify-full sslrootcert=global-bundle.pem" \
-     -f pg-major-version-upgrade-precheck-plpgsql.sql
-```
-
-```sql
--- Step 2: Run the precheck (e.g. upgrading to PG 16)
-SELECT * FROM public.pg_major_version_upgrade_precheck(16);
-
--- Or for a compact summary view:
-SELECT check_id, check_scope, status FROM public.pg_major_version_upgrade_precheck(16);
-
--- Step 3: Clean up (recommended - remove the function after use)
-DROP FUNCTION IF EXISTS public.pg_major_version_upgrade_precheck(integer);
 ```
 
 Return columns:
@@ -100,11 +78,6 @@ pg_roles, pg_stat_user_indexes, pg_stat_user_tables, pg_stat_activity,
 pg_largeobject_metadata, pg_foreign_table, pg_foreign_server,
 pg_foreign_data_wrapper, pg_publication, pg_index, pg_rewrite, pg_depend
 ```
-
-### PL/pgSQL Version
-
-- **Step 1 & 3** (CREATE/DROP function): `CREATE` privilege on the `public` schema
-- **Step 2** (execution): Same `SELECT` permissions as the SQL version
 
 ## Note on Internal Schemas
 
