@@ -34,63 +34,6 @@ list-databases-size.sql             :  List top 20 databases the user can connec
                                        I started with the query run by the \l+ psql command and sorted by size 
                                        and added a limit of 20
 
-##########################################################################
-rds-support-tools/postgres/diag/sql/pg-major-version-upgrade-precheck-tool
-##########################################################################
-
-pg-major-version-upgrade-precheck-sql.sql                :   Aurora/RDS PostgreSQL Major Version Upgrade Pre-check Script (SQL version).
-                                                            Pure psql meta-command based script that performs 51 checks to validate
-                                                            upgrade readiness before a major version upgrade.
-
-                                                            Features:
-                                                            - 25 standard pre-upgrade checks 
-                                                            - 14 Blue/Green deployment checks
-                                                            - 12 critical upgrade blocker checks
-
-                                                            Usage:
-                                                                psql "host=<HOST> port=<PORT> user=<USER> dbname=postgres \
-                                                                    sslmode=verify-full sslrootcert=global-bundle.pem" \
-                                                                    -v target_version=<16> -f pg-major-version-upgrade-precheck-sql.sql
-
-                                                            Note: Must be executed against each database individually.
-                                                            For automated cross-database execution, use the shell version.
-
-                                                            Prerequisites:
-                                                                Any PostgreSQL client (psql. etc.)
-
-                                                            Tested on RDS PostgreSQL 11-17, Aurora PostgreSQL 11-17
-
-
-pg-major-version-upgrade-precheck-plpgsql.sql            :   Aurora/RDS PostgreSQL Major Version Upgrade Pre-check Script (PL/pgSQL version).
-                                                            Performs 51 comprehensive checks across all databases in a cluster
-                                                            to validate upgrade readiness before a major version upgrade.
-                                                            Can be called from any PostgreSQL client.
-
-                                                            Features:
-                                                            - 25 standard pre-upgrade checks
-                                                            - 14 Blue/Green deployment checks
-                                                            - 12 critical upgrade blocker checks
-
-                                                            Usage:
-                                                                -- Step 1: Load the function
-                                                                psql "host=<HOST> port=<PORT> user=<USER> dbname=postgres \
-                                                                    sslmode=verify-full sslrootcert=global-bundle.pem" \
-                                                                    -f pg-major-version-upgrade-precheck-plpgsql.sql
-
-                                                                -- Step 2: Run the precheck
-                                                                SELECT * FROM public.pg_major_version_upgrade_precheck(16);
-
-                                                                -- Step 3: Clean up
-                                                                DROP FUNCTION IF EXISTS public.pg_major_version_upgrade_precheck(integer);
-
-                                                            Note: Must be loaded and executed in each database individually.
-                                                            For automated cross-database execution, use the shell version.
-
-                                                            Prerequisites:
-                                                                Any PostgreSQL client (psql. etc.)
-
-                                                            Tested on RDS PostgreSQL 11-17, Aurora PostgreSQL 11-17
-
 #####################################
 rds-support-tools/postgres/diag/shell
 #####################################
@@ -113,9 +56,10 @@ postgresql-diagnostics.sh           :   Bash script that can be added to a cront
                                         Calls are made to the instance directly to execute SQL commands and output is redirected to output file
                                         Requires endpoint, role and database to be passed as execution parameters
 
-##########################################################################
-rds-support-tools/postgres/diag/shell/pg-major-version-upgrade-precheck-tool
-##########################################################################
+
+################################################################################
+rds-support-tools/postgres/diag/pg-major-version-upgrade-precheck-tool/shell/
+################################################################################
 
 pg-major-version-upgrade-precheck.sh            :   Aurora/RDS PostgreSQL Major Version Upgrade Pre-check Script.
                                         Performs 51 comprehensive checks across all databases in a cluster
@@ -179,6 +123,66 @@ wrapper.sh                          :   Batch execution wrapper for pg-major-ver
                                             pg-major-version-upgrade-precheck.sh in the same directory
 
                                         Tested on RDS PostgreSQL 11-17, Aurora PostgreSQL 11-17
+
+################################################################################
+rds-support-tools/postgres/diag/pg-major-version-upgrade-precheck-tool/sql/
+################################################################################
+
+pg-major-version-upgrade-precheck-sql.sql                :   Aurora/RDS PostgreSQL Major Version Upgrade Pre-check Script (SQL version).
+                                                            Pure psql meta-command based script that performs 51 checks to validate
+                                                            upgrade readiness before a major version upgrade.
+
+                                                            Features:
+                                                            - 25 standard pre-upgrade checks 
+                                                            - 14 Blue/Green deployment checks
+                                                            - 12 critical upgrade blocker checks
+
+                                                            Usage:
+                                                                psql "host=<HOST> port=<PORT> user=<USER> dbname=postgres \
+                                                                    sslmode=verify-full sslrootcert=global-bundle.pem" \
+                                                                    -v target_version=<16> -f pg-major-version-upgrade-precheck-sql.sql
+
+                                                            Note: Must be executed against each database individually.
+                                                            For automated cross-database execution, use the shell version.
+
+                                                            Prerequisites:
+                                                                Any PostgreSQL client (psql. etc.)
+
+                                                            Tested on RDS PostgreSQL 11-17, Aurora PostgreSQL 11-17
+
+################################################################################
+rds-support-tools/postgres/diag/pg-major-version-upgrade-precheck-tool/plpgsql/
+################################################################################
+
+pg-major-version-upgrade-precheck-plpgsql.sql            :   Aurora/RDS PostgreSQL Major Version Upgrade Pre-check Script (PL/pgSQL version).
+                                                            Performs 51 comprehensive checks across all databases in a cluster
+                                                            to validate upgrade readiness before a major version upgrade.
+                                                            Can be called from any PostgreSQL client.
+
+                                                            Features:
+                                                            - 25 standard pre-upgrade checks
+                                                            - 14 Blue/Green deployment checks
+                                                            - 12 critical upgrade blocker checks
+
+                                                            Usage:
+                                                                -- Step 1: Load the function
+                                                                psql "host=<HOST> port=<PORT> user=<USER> dbname=postgres \
+                                                                    sslmode=verify-full sslrootcert=global-bundle.pem" \
+                                                                    -f pg-major-version-upgrade-precheck-plpgsql.sql
+
+                                                                -- Step 2: Run the precheck
+                                                                SELECT * FROM public.pg_major_version_upgrade_precheck(16);
+
+                                                                -- Step 3: Clean up
+                                                                DROP FUNCTION IF EXISTS public.pg_major_version_upgrade_precheck(integer);
+
+                                                            Note: Must be loaded and executed in each database individually.
+                                                            For automated cross-database execution, use the shell version.
+
+                                                            Prerequisites:
+                                                                Any PostgreSQL client (psql. etc.)
+
+                                                            Tested on RDS PostgreSQL 11-17, Aurora PostgreSQL 11-17
 
 #####################################
 rds-support-tools/postgres/diag/proc

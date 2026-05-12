@@ -41,8 +41,9 @@
 * [RDS Proxy](https://aws.amazon.com/rds/proxy/)
 
 ## Aurora/RDS PostgreSQL Major Version Upgrade Pre-check Tool:
-* [Shell Version](https://github.com/nickyhsu-aws/rds-support-tools/tree/main/postgres/diag/shell/pg-major-version-upgrade-precheck-tool)
-* [SQL & PL/pgSQL Versions](https://github.com/nickyhsu-aws/rds-support-tools/tree/main/postgres/diag/sql/pg-major-version-upgrade-precheck-tool)
+* [Shell Script Version](https://github.com/nickyhsu-aws/rds-support-tools/tree/main/postgres/diag/pg-major-version-upgrade-precheck-tool/shell)
+* [SQL Version](https://github.com/nickyhsu-aws/rds-support-tools/tree/main/postgres/diag/pg-major-version-upgrade-precheck-tool/sql)
+* [PL/PGSQL Version](https://github.com/nickyhsu-aws/rds-support-tools/tree/main/postgres/diag/pg-major-version-upgrade-precheck-tool/plpgsql)
 
 ## Other scripts:
 
