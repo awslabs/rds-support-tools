@@ -2,7 +2,7 @@
 
 ## Overview
 
-Validates PostgreSQL databases before a major version upgrade. Identifies configuration issues, compatibility blockers, and Blue/Green deployment requirements.
+Validates RDS/Aurora PostgreSQL databases before a major version upgrade. Identifies configuration issues, compatibility blockers, and Blue/Green deployment requirements.
 
 ## Prerequisites
 

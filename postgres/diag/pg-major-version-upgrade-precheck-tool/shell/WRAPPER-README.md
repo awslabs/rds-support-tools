@@ -2,7 +2,7 @@
 
 ## Overview
 
-`wrapper.sh` runs pre-upgrade checks against multiple PostgreSQL databases using a CSV file. It calls `pg-major-version-upgrade-precheck.sh` for each entry and produces a summary of results.
+`wrapper.sh` runs pre-upgrade checks against multiple RDS/Aurora PostgreSQL Instances/Clusters using a CSV file. It calls `pg-major-version-upgrade-precheck.sh` for each entry and produces a summary of results.
 
 ## Prerequisites
 
