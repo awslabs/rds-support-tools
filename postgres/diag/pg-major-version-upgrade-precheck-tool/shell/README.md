@@ -136,4 +136,4 @@ export BLUE_GREEN_MODE="true"
 
 ## Batch Execution
 
-Use `wrapper.sh` to run checks against multiple databases from a CSV file. See `WRAPPER-README.md`.
+Use `wrapper.sh` to run checks against multiple RDS/Aurora PostgreSQL Instances/Clusters from a CSV file. See `WRAPPER-README.md`.
