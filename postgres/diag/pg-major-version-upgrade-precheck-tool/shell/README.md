@@ -1,8 +1,8 @@
-# PostgreSQL Major Version Upgrade (MVU) Pre-Check Script
+# RDS/Aurora PostgreSQL Major Version Upgrade Precheck Tool
 
 ## Overview
 
-Validates PostgreSQL databases before a major version upgrade. Identifies configuration issues, compatibility blockers, and Blue/Green deployment requirements.
+Validates RDS/Aurora PostgreSQL databases before a major version upgrade. Identifies configuration issues, compatibility blockers, and Blue/Green deployment requirements.
 
 ## Prerequisites
 
@@ -136,4 +136,4 @@ export BLUE_GREEN_MODE="true"
 
 ## Batch Execution
 
-Use `wrapper.sh` to run checks against multiple databases from a CSV file. See `WRAPPER-README.md`.
+Use `wrapper.sh` to run checks against multiple RDS/Aurora PostgreSQL Instances/Clusters from a CSV file. See `WRAPPER-README.md`.
