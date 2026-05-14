@@ -1,4 +1,4 @@
-# PostgreSQL Major Version Upgrade (MVU) Pre-Check Script
+# RDS/Aurora PostgreSQL Major Version Upgrade (MVU) Pre-Check Script
 
 ## Overview
 

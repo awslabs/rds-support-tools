@@ -1,4 +1,4 @@
-# Aurora/RDS PostgreSQL Major Version Upgrade Precheck Tool (SQL)
+# RDS/Aurora PostgreSQL Major Version Upgrade Precheck Tool (SQL)
 
 Run this tool before performing a Major Version Upgrade on RDS/Aurora PostgreSQL to detect common issues that may cause the upgrade to fail.
 
