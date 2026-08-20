@@ -131,6 +131,8 @@ generate_csv() {
     create_baseline=$(get_user_input "Create Baseline Stats (yes/no)" "no")
     local source_version
     source_version=$(get_user_input "Source PostgreSQL Version (e.g., 13)" "13")
+    local target_version
+    target_version=$(get_user_input "Target PostgreSQL Version to upgrade to (11-18)" "")
     local blue_green
     blue_green=$(get_user_input "Use Blue/Green Deployment Checks? (Y/N)" "N")
     
@@ -139,6 +141,11 @@ generate_csv() {
     
     if [ -z "$source_version" ]; then
         echo -e "${RED}✗ Source PostgreSQL Version is required${NC}"
+        return 1
+    fi
+
+    if ! [[ "$target_version" =~ ^[0-9]+$ ]] || [ "$target_version" -lt 11 ] || [ "$target_version" -gt 18 ]; then
+        echo -e "${RED}✗ Target PostgreSQL Version must be a number between 11 and 18${NC}"
         return 1
     fi
     
@@ -203,7 +210,7 @@ generate_csv() {
     echo ""
     
     # Create CSV file with engine, blue_green, and secrets manager columns
-    echo "mode,region,identifier,profile,host,port,database,username,password,secret_arn,secret_key,baseline,engine,blue_green,format" > "${CSV_FILE}"
+    echo "mode,region,identifier,profile,host,port,target_version,database,username,password,secret_arn,secret_key,baseline,engine,blue_green,format" > "${CSV_FILE}"
     
     # Add RDS instances to CSV
     local identifier endpoint port master_user db_name engine_version instance_class
@@ -217,7 +224,7 @@ generate_csv() {
         instance_class=$(echo "$rds_instances" | jq -r ".[$i].InstanceClass")
         
         # Add row to CSV
-        echo "${run_mode},${aws_region},${identifier},${aws_profile},${endpoint},${port},${db_name},${master_user},,,password,${create_baseline},postgres,${blue_green},html" >> "${CSV_FILE}"
+        echo "${run_mode},${aws_region},${identifier},${aws_profile},${endpoint},${port},${target_version},${db_name},${master_user},,,password,${create_baseline},postgres,${blue_green},html" >> "${CSV_FILE}"
         
         echo -e "  ${CYAN}[RDS]${NC} ${identifier} (${engine_version}, ${instance_class}) - ${endpoint}:${port}"
     done
@@ -247,7 +254,7 @@ generate_csv() {
         fi
         
         # Add row to CSV
-        echo "${run_mode},${aws_region},${identifier},${aws_profile},${endpoint},${port},${db_name},${master_user},,,password,${create_baseline},aurora-postgresql,${blue_green},html" >> "${CSV_FILE}"
+        echo "${run_mode},${aws_region},${identifier},${aws_profile},${endpoint},${port},${target_version},${db_name},${master_user},,,password,${create_baseline},aurora-postgresql,${blue_green},html" >> "${CSV_FILE}"
         
         echo -e "  ${CYAN}[Aurora]${NC} ${identifier} (${engine_version}${capacity_info}) - ${endpoint}:${port}"
     done
@@ -258,7 +265,7 @@ generate_csv() {
     echo -e "${YELLOW}⚠ IMPORTANT: Please update the password/secret columns in ${CSV_FILE} before running option 2${NC}"
     echo ""
     echo "CSV Format:"
-    echo "  mode,region,identifier,profile,host,port,database,username,password,secret_arn,secret_key,baseline,engine,blue_green,format"
+    echo "  mode,region,identifier,profile,host,port,target_version,database,username,password,secret_arn,secret_key,baseline,engine,blue_green,format"
     echo ""
     echo "Password Options (choose one per row):"
     echo "  1. Direct password: Fill 'password' column, leave 'secret_arn' and 'secret_key' empty"
@@ -290,10 +297,10 @@ validate_csv() {
     # Check if CSV has header
     local header
     header=$(head -n 1 "${CSV_FILE}")
-    if [[ ! "$header" =~ ^mode,region,identifier,profile,host,port,database,username,password ]]; then
+    if [[ ! "$header" =~ ^mode,region,identifier,profile,host,port,target_version,database,username,password ]]; then
         echo -e "${RED}✗ Invalid CSV format${NC}"
-        echo "Expected header: mode,region,identifier,profile,host,port,database,username,password,secret_arn,secret_key,baseline[,engine][,blue_green]"
-        echo "Note: 'secret_arn', 'secret_key', 'engine' and 'blue_green' columns are optional for backward compatibility"
+        echo "Expected header: mode,region,identifier,profile,host,port,target_version,database,username,password,secret_arn,secret_key,baseline[,engine][,blue_green][,format]"
+        echo "Note: 'secret_arn', 'secret_key', 'engine', 'blue_green' and 'format' columns are optional for backward compatibility"
         return 1
     fi
     
@@ -317,9 +324,9 @@ check_empty_passwords() {
     local empty_count=0
     local line_num=1
     # shellcheck disable=SC2034
-    local mode region identifier profile host port database username password secret_arn secret_key baseline engine blue_green format
+    local mode region identifier profile host port target_version database username password secret_arn secret_key baseline engine blue_green format
     
-    while IFS=',' read -r mode region identifier profile host port database username password secret_arn secret_key baseline engine blue_green format; do
+    while IFS=',' read -r mode region identifier profile host port target_version database username password secret_arn secret_key baseline engine blue_green format; do
         # Skip header
         if [ "$line_num" -eq 1 ]; then
             line_num=$((line_num + 1))
@@ -379,10 +386,10 @@ run_preupgrade_checks() {
     local success_count=0
     local failure_count=0
     local skipped_count=0
-    local mode region identifier profile host port database username password secret_arn secret_key baseline engine blue_green format
+    local mode region identifier profile host port target_version database username password secret_arn secret_key baseline engine blue_green format
     
     # shellcheck disable=SC2034
-    while IFS=',' read -r mode region identifier profile host port database username password secret_arn secret_key baseline engine blue_green format; do
+    while IFS=',' read -r mode region identifier profile host port target_version database username password secret_arn secret_key baseline engine blue_green format; do
         # Skip header
         if [ "$line_num" -eq 1 ]; then
             line_num=$((line_num + 1))
@@ -424,15 +431,15 @@ run_preupgrade_checks() {
         
         # Add SQL mode arguments if needed
         if [[ "$mode" == "sql" ]] || [[ "$mode" == "both" ]]; then
-            if [ -z "$host" ] || [ -z "$port" ] || [ -z "$database" ] || [ -z "$username" ]; then
-                echo -e "${RED}✗ Skipping: Missing SQL connection parameters${NC}"
+            if [ -z "$host" ] || [ -z "$port" ] || [ -z "$target_version" ] || [ -z "$database" ] || [ -z "$username" ]; then
+                echo -e "${RED}✗ Skipping: Missing SQL connection parameters (need host/port/target_version/database/username)${NC}"
                 skipped_count=$((skipped_count + 1))
                 echo ""
                 line_num=$((line_num + 1))
                 continue
             fi
             
-            cmd_args+=("-h" "${host}" "-P" "${port}" "-d" "${database}" "-u" "${username}")
+            cmd_args+=("-h" "${host}" "-P" "${port}" "-d" "${database}" "-u" "${username}" "-t" "${target_version}")
             
             # Handle password or secret_arn
             if [ -n "$secret_arn" ]; then

@@ -26,7 +26,7 @@ Prompts for run mode, connection details, password, report format, and optional 
 ```bash
 # SQL checks only
 ./pg-major-version-upgrade-precheck.sh --non-interactive -m sql \
-  -h mydb.rds.amazonaws.com -P 5432 -d postgres -u admin -w mypassword
+  -h mydb.rds.amazonaws.com -P 5432 -d postgres -u admin -w mypassword -t 18
 
 # RDS configuration only
 ./pg-major-version-upgrade-precheck.sh --non-interactive -m rds \
@@ -35,15 +35,15 @@ Prompts for run mode, connection details, password, report format, and optional 
 # Both RDS + SQL
 ./pg-major-version-upgrade-precheck.sh --non-interactive -m both \
   -r us-east-1 -i my-db-instance -p default \
-  -h mydb.rds.amazonaws.com -P 5432 -d postgres -u admin -w mypassword
+  -h mydb.rds.amazonaws.com -P 5432 -d postgres -u admin -w mypassword -t 18
 
 # With Blue/Green checks
 ./pg-major-version-upgrade-precheck.sh --non-interactive --blue-green -m sql \
-  -h mydb.rds.amazonaws.com -d postgres -u admin -w mypassword
+  -h mydb.rds.amazonaws.com -d postgres -u admin -w mypassword -t 18
 
 # Text report instead of HTML
 ./pg-major-version-upgrade-precheck.sh --non-interactive -m sql \
-  -h mydb.rds.amazonaws.com -d postgres -u admin -w mypassword --format text
+  -h mydb.rds.amazonaws.com -d postgres -u admin -w mypassword --format text -t 18
 ```
 
 ### Using AWS Secrets Manager
@@ -51,11 +51,11 @@ Prompts for run mode, connection details, password, report format, and optional 
 ```bash
 # By secret name
 ./pg-major-version-upgrade-precheck.sh --non-interactive -m sql \
-  -h mydb.rds.amazonaws.com -d postgres -u admin -s my-db-secret
+  -h mydb.rds.amazonaws.com -d postgres -u admin -s my-db-secret -t 18
 
 # By ARN with custom JSON key
 ./pg-major-version-upgrade-precheck.sh --non-interactive -m sql \
-  -h mydb.rds.amazonaws.com -d postgres -u admin \
+  -h mydb.rds.amazonaws.com -d postgres -u admin -t 18 \
   -s arn:aws:secretsmanager:us-east-1:123456789:secret:my-secret \
   --secret-key db_password
 ```
@@ -72,6 +72,7 @@ Secret must be stored as JSON: `{"password": "your-password"}`
 | `-d, --database` | Database name | required for sql/both |
 | `-u, --user` | Database username | required for sql/both |
 | `-w, --password` | Database password | required for sql/both* |
+| `-t, --target-version` | Target major version to upgrade to (11-18) | required for sql/both |
 | `-s, --secret-arn` | Secrets Manager ARN or name | alternative to password |
 | `--secret-key` | JSON key for password in secret | `password` |
 | `-r, --region` | AWS region | required for rds/both |
@@ -118,6 +119,7 @@ export DB_PORT="5432"
 export DB_NAME="postgres"
 export DB_USER="admin"
 export DB_PASS="mypassword"
+export TARGET_VERSION_ENV="18"
 export REPORT_FORMAT="text"
 export BLUE_GREEN_MODE="true"
 

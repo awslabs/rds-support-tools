@@ -22,7 +22,7 @@
 ## CSV Format
 
 ```
-mode,region,identifier,profile,host,port,database,username,password,secret_arn,secret_key,baseline,engine,blue_green,format
+mode,region,identifier,profile,host,port,target_version,database,username,password,secret_arn,secret_key,baseline,engine,blue_green,format
 ```
 
 ### Column Reference
@@ -35,6 +35,7 @@ mode,region,identifier,profile,host,port,database,username,password,secret_arn,s
 | `profile` | AWS CLI profile | `default` |
 | `host` | Database endpoint | `mydb.cluster-xxx.rds.amazonaws.com` |
 | `port` | Database port | `5432` |
+| `target_version` | Target Version (Support 11-18) | `18` |
 | `database` | Database name | `postgres` |
 | `username` | Database username | `admin` |
 | `password` | Password (leave empty if using `secret_arn`) | `MyPassword` |
@@ -48,10 +49,10 @@ mode,region,identifier,profile,host,port,database,username,password,secret_arn,s
 ### Example CSV
 
 ```csv
-mode,region,identifier,profile,host,port,database,username,password,secret_arn,secret_key,baseline,engine,blue_green,format
-both,us-east-1,prod-cluster,default,prod.cluster-xxx.rds.amazonaws.com,5432,postgres,admin,SecurePass,,,yes,aurora-postgresql,Y,html
-both,us-east-1,staging-cluster,default,staging.cluster-xxx.rds.amazonaws.com,5432,postgres,admin,,my-secret,password,no,aurora-postgresql,N,html
-sql,us-west-2,dev-instance,default,dev.xxx.rds.amazonaws.com,5432,mydb,dbuser,DevPass,,,no,postgres,N,text
+mode,region,identifier,profile,host,port,target_version,database,username,password,secret_arn,secret_key,baseline,engine,blue_green,format
+both,us-east-1,prod-cluster,default,prod.cluster-xxx.rds.amazonaws.com,5432,18,postgres,admin,SecurePass,,,yes,aurora-postgresql,Y,html
+both,us-east-1,staging-cluster,default,staging.cluster-xxx.rds.amazonaws.com,5432,18,postgres,admin,,my-secret,password,no,aurora-postgresql,N,html
+sql,us-west-2,dev-instance,default,dev.xxx.rds.amazonaws.com,5432,16,mydb,dbuser,DevPass,,,no,postgres,N,text
 ```
 
 ## Report Format

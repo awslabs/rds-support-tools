@@ -54,26 +54,26 @@
 #   - Check 35b: DTS Trigger Check for Blue/Green Deployments
 #   - Check 35c: max_locks_per_transaction Validation for Blue/Green Deployments
 #
-# Critical Upgrade Blocker Checks (36-46): Always executed (version-conditional)
-#   - Check 36: chkpass Extension (not supported in PG >= 11) - PG <= 11 only
-#   - Check 37: tsearch2 Extension (not supported in PG >= 11) - PG <= 11 only
-#   - Check 38: pg_repack Extension (must drop before PG >= 14) - PG <= 14 only
+# Critical Upgrade Blocker Checks (36-51): Executed based on source/target version
+#   - Check 36: chkpass Extension (removed in PG 11) - target >= 11 only
+#   - Check 37: tsearch2 Extension (removed in PG 11) - target >= 11 only
+#   - Check 38: pg_repack Extension (must drop before PG >= 14) - target >= 14 only
 #   - Check 39: System-Defined Composite Types (unstable OIDs)
 #   - Check 39b: reg* Data Types in User Tables (OIDs not preserved by pg_upgrade)
-#   - Check 40: aclitem Data Type (format changed in PG 16)
-#   - Check 41: sql_identifier Data Type (format changed in PG 12) - PG < 12 only
-#   - Check 42: Removed Data Types (abstime, reltime, tinterval) - PG < 12 only
-#   - Check 43: Tables WITH OIDS (not supported in PG >= 12) - PG < 12 only
-#   - Check 44: User-Defined Encoding Conversions (not supported in PG >= 14) - PG <= 14 only
-#   - Check 45: User-Defined Postfix Operators (not supported in PG >= 14) - PG <= 14 only
-#   - Check 46: Incompatible Polymorphic Functions (changed in PG 14) - PG <= 14 only
-#   - Check 47: Invalid Logical Replication Slots (PG >= 17 only)
-#   - Check 47b: Inactive Logical Slots with Unconsumed WAL (PG >= 17 only)
-#   - Check 47c: Active Logical Slots with WAL Lag (PG >= 17 only)
-#   - Check 48: Subscription State Check (PG >= 17 only)
+#   - Check 40: aclitem Data Type (format changed in PG 16) - source <= 15 and target >= 16 only
+#   - Check 41: sql_identifier Data Type (format changed in PG 12) - source < 12 only
+#   - Check 42: Removed Data Types (abstime, reltime, tinterval) - source < 12 only
+#   - Check 43: Tables WITH OIDS (not supported in PG >= 12) - source < 12 only
+#   - Check 44: User-Defined Encoding Conversions (changed in PG 14) - source <= 13 only
+#   - Check 45: User-Defined Postfix Operators (removed in PG 14) - source <= 13 only
+#   - Check 46: Incompatible Polymorphic Functions (changed in PG 14) - source <= 13 only
+#   - Check 47: Invalid Logical Replication Slots (source >= 17 only)
+#   - Check 47b: Inactive Logical Slots with Unconsumed WAL (source >= 17 only)
+#   - Check 47c: Active Logical Slots with WAL Lag (source >= 17 only)
+#   - Check 48: Subscription State Check (source >= 17 only)
 #   - Check 49: contrib/isn and int8 Passing Mismatch
-#   - Check 50: NOT NULL Inheritance Mismatch
-#   - Check 51: Unicode-Dependent Objects (PG >= 17 only)
+#   - Check 50: NOT NULL Inheritance Mismatch (fails pg_upgrade to PG 18+) - target >= 18 only
+#   - Check 51: Unicode-Dependent Objects - source >= 17 and target >= 18 only
 #
 # Version-Specific Checks: Automatically skipped when not applicable
 #   - Check 44: User-Defined Encoding Conversions (PG <= 13 only)
@@ -96,6 +96,7 @@ DB_IDENTIFIER=""
 AWS_PROFILE=""
 DB_HOST=""
 DB_PORT=""
+TARGET_VERSION=""
 DB_NAME=""
 DB_USER=""
 DB_PASS=""
@@ -147,6 +148,7 @@ OPTIONS:
     -p, --profile PROFILE        AWS profile (default: default)
     -h, --host HOST              Database/Cluster endpoint (required for sql/both mode)
     -P, --port PORT              Database port (default: 5432)
+    -t, --target-version VER     Target major version to upgrade to (11-18, required)
     -d, --database DATABASE      Database name (required for sql/both mode)
     -u, --user USER              Database username (required for sql/both mode)
     -w, --password PASSWORD      Database password (required for sql/both mode)
@@ -163,28 +165,28 @@ EXAMPLES:
     $0
 
     # Standard checks only (non-interactive with password)
-    $0 --non-interactive -m sql -h localhost -P 5432 -d mydb -u postgres -w mypassword
+    $0 --non-interactive -m sql -h localhost -P 5432 -t 16 -d mydb -u postgres -w mypassword
 
     # Standard checks with AWS Secrets Manager
-    $0 --non-interactive -m sql -h localhost -P 5432 -d mydb -u postgres -s my-db-secret
+    $0 --non-interactive -m sql -h localhost -P 5432 -t 16 -d mydb -u postgres -s my-db-secret
 
     # With Secrets Manager ARN and custom key
-    $0 --non-interactive -m sql -h localhost -d mydb -u postgres \
+    $0 --non-interactive -m sql -h localhost -t 16 -d mydb -u postgres \
        -s arn:aws:secretsmanager:us-east-1:123456789:secret:db-pass \
        --secret-key db_password
 
     # With blue/green checks (non-interactive)
-    $0 --non-interactive --blue-green -m sql -h localhost -P 5432 -d mydb -u postgres -w mypassword
+    $0 --non-interactive --blue-green -m sql -h localhost -P 5432 -t 16 -d mydb -u postgres -w mypassword
 
     # RDS mode with blue/green checks
     $0 -m rds -r us-east-1 -i my-db-instance -p default --blue-green
 
     # Both modes with Secrets Manager
-    $0 -m both -r us-east-1 -i my-db -p default -h localhost -d mydb -u postgres -s my-db-secret --blue-green
+    $0 -m both -r us-east-1 -i my-db -p default -h localhost -t 16 -d mydb -u postgres -s my-db-secret --blue-green
 
 ENVIRONMENT VARIABLES (alternative to arguments):
     RUN_MODE, AWS_REGION, DB_IDENTIFIER, AWS_PROFILE
-    DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS, DB_SECRET_ARN, DB_SECRET_KEY
+    DB_HOST, DB_PORT, TARGET_VERSION, DB_NAME, DB_USER, DB_PASS, DB_SECRET_ARN, DB_SECRET_KEY
     CREATE_BASELINE, BLUE_GREEN_MODE
 
 EOF
@@ -250,6 +252,11 @@ parse_arguments() {
                 NON_INTERACTIVE=true
                 shift 2
                 ;;
+            -t|--target-version)
+                TARGET_VERSION="$2"
+                NON_INTERACTIVE=true
+                shift 2
+                ;;
             -d|--database)
                 DB_NAME="$2"
                 NON_INTERACTIVE=true
@@ -310,7 +317,8 @@ parse_arguments() {
     AWS_PROFILE=${AWS_PROFILE:-${AWS_PROFILE_ENV:-default}}
     DB_HOST=${DB_HOST:-$DB_HOST_ENV}
     DB_PORT=${DB_PORT:-${DB_PORT_ENV:-5432}}
-    DB_NAME=${DB_NAME:-$DB_NAME_ENV}
+    TARGET_VERSION=${TARGET_VERSION:-$TARGET_VERSION_ENV}
+    DB_NAME=${DB_NAME:-${DB_NAME_ENV:-postgres}}
     DB_USER=${DB_USER:-$DB_USER_ENV}
     DB_PASS=${DB_PASS:-$DB_PASS_ENV}
     DB_SECRET_ARN=${DB_SECRET_ARN:-$DB_SECRET_ARN_ENV}
@@ -368,6 +376,13 @@ validate_parameters() {
             echo -e "${RED}✗ Error: Database name (-d/--database) is required for SQL mode${NC}"
             errors=$((errors + 1))
         fi
+        if [ -z "$TARGET_VERSION" ]; then
+            echo -e "${RED}✗ Error: Target version (-t/--target-version) is required for SQL mode${NC}"
+            errors=$((errors + 1))
+        elif ! _valid_target_version "$TARGET_VERSION"; then
+            echo -e "${RED}✗ Error: Target version must be a major version number between 11 and 18${NC}"
+            errors=$((errors + 1))
+        fi
         if [ -z "$DB_USER" ]; then
             echo -e "${RED}✗ Error: Database user (-u/--user) is required for SQL mode${NC}"
             errors=$((errors + 1))
@@ -416,6 +431,7 @@ _valid_hostname() { [ -n "$1" ] && [ ${#1} -le 253 ] && [[ "$1" =~ ^[a-zA-Z0-9._
 _valid_port()     { [[ "$1" =~ ^[0-9]+$ ]] && [ ${#1} -le 5 ] && [ "$1" -ge 1 ] && [ "$1" -le 65535 ]; }
 _valid_dbname()   { [ -n "$1" ] && [ ${#1} -le 63 ] && [[ "$1" =~ ^[a-zA-Z0-9._-]+$ ]]; }
 _valid_dbuser()   { [ -n "$1" ] && [ ${#1} -le 63 ] && [[ "$1" =~ ^[a-zA-Z0-9._-]+$ ]]; }
+_valid_target_version() { [[ "$1" =~ ^[0-9]+$ ]] && [ "$1" -ge 11 ] && [ "$1" -le 18 ]; }
 
 validate_sql_inputs() {
     local errors=0
@@ -774,6 +790,7 @@ get_connection_details() {
         echo "Using database connection:"
         echo "  Host: ${DB_HOST}"
         echo "  Port: ${DB_PORT}"
+        echo "  Target Version: ${TARGET_VERSION}"
         echo "  Database: ${DB_NAME}"
         echo "  User: ${DB_USER}"
         if [ -n "$DB_SECRET_ARN" ]; then
@@ -807,12 +824,21 @@ get_connection_details() {
             fi
         done
         
+        # Validate target major version with re-prompt loop
+        while true; do
+            read -r -p "Target major version to upgrade to (e.g., 16): " TARGET_VERSION
+            if ! _valid_target_version "$TARGET_VERSION"; then
+                echo -e "${RED}✗ Invalid target version. Enter a major version number between 11 and 18.${NC}"
+            else
+                break
+            fi
+        done
+        
         # Validate database name with re-prompt loop
         while true; do
-            read -r -p "Database Name: " DB_NAME
-            if [ -z "$DB_NAME" ]; then
-                echo -e "${RED}✗ Database name is required${NC}"
-            elif ! _valid_dbname "$DB_NAME"; then
+            read -r -p "Database Name [postgres]: " DB_NAME
+            DB_NAME=${DB_NAME:-postgres}
+            if ! _valid_dbname "$DB_NAME"; then
                 echo -e "${RED}✗ Invalid database name. Use only letters, digits, dots, underscores, hyphens (max 63 chars)${NC}"
             else
                 break
@@ -4399,7 +4425,7 @@ execute_check() {
         fi
         
         case "${base_check_name}" in
-            "PostgreSQL Version Check"|"User Databases List"|"Database Size Analysis"|"Critical Configuration Parameters"|"Object Count Check"|"Top 20 Largest Tables"|"Unused Indexes Analysis"|"Transaction ID Age Check"|"Schema Usage")
+            "PostgreSQL Version Check"|"Target Version Check"|"User Databases List"|"Database Size Analysis"|"Critical Configuration Parameters"|"Object Count Check"|"Top 20 Largest Tables"|"Unused Indexes Analysis"|"Transaction ID Age Check"|"Schema Usage")
                 # No status needed - always INFO
                 status="INFO"
                 ;;
@@ -4906,6 +4932,12 @@ EOF
         # Detect PostgreSQL major version for version-specific checks
         get_pg_major_version
         
+        # Sanity check: target version must be greater than the detected source version
+        if [ "$PG_MAJOR_VERSION" -ne 0 ] && [ -n "$TARGET_VERSION" ] && [ "$TARGET_VERSION" -le "$PG_MAJOR_VERSION" ]; then
+            echo -e "${RED}❌ ERROR: Target version ($TARGET_VERSION) must be greater than source version ($PG_MAJOR_VERSION).${NC}"
+            exit 1
+        fi
+        
         # Check 1: PostgreSQL Version
         execute_check \
             "PostgreSQL Version Check" \
@@ -4913,7 +4945,15 @@ EOF
             "SELECT version();" \
             "${output_file}" \
             "1"
-        
+
+        # Check 1b: Target Version
+        execute_check \
+            "Target Version Check" \
+            "The target major version this upgrade is being checked against" \
+            "SELECT '${TARGET_VERSION}' AS target_major_version;" \
+            "${output_file}" \
+            "1b"
+
         # Check 2: Invalid Databases Check
         check_invalid_databases \
             "Invalid Databases Check - what to check: \"Databases with datconnlimit = -2 are marked as invalid and cannot be accessed. These must be dropped or fixed before upgrade.\"" \
@@ -5153,7 +5193,8 @@ EOF
             "${output_file}" \
             "12"
         
-        # Check 13: Replication Slots Check
+        # Check 13: Replication Slots Check - Only for source PG < 17 (17+ can migrate logical slots)
+        if [ "$PG_MAJOR_VERSION" -lt 17 ]; then
         execute_check \
             "Replication Slots Check - what to check: \"Upgrade fails if logical replication slots exist. Drop logical slots before upgrade.\"" \
             "Check for existing replication slots" \
@@ -5163,6 +5204,9 @@ EOF
             SELECT slot_name, plugin, slot_type, database, active, active_pid, xmin, catalog_xmin, restart_lsn, confirmed_flush_lsn FROM pg_replication_slots;" \
             "${output_file}" \
             "13"
+        else
+            echo "Skipping Check 13 (Replication Slots) - PostgreSQL 17+ supports logical slot migration"
+        fi
         
         # Check 14: Database Configuration Parameters
         execute_check \
@@ -5586,7 +5630,13 @@ $(echo -e "${recommendations}" | sed 's/^/  /')
         local version_check_result=""
         local version_check_status="SUCCESS"
         
-        if [ -n "$current_version" ]; then
+        if [ -z "$AWS_REGION" ]; then
+            version_check_result="Current Version: ${current_version:-unknown}
+
+Skipped: AWS region not provided, so valid upgrade targets could not be queried from the RDS API.
+This check requires an AWS region (-r/--region) and AWS credentials; it does not apply in SQL-only mode."
+            version_check_status="INFO"
+        elif [ -n "$current_version" ]; then
             # Determine engine type for AWS CLI query
             local engine_param="postgres"
             if [ "$ENGINE_TYPE" == "aurora-postgresql" ]; then
@@ -5949,8 +5999,8 @@ Details: ${upgrade_targets}"
         echo -e "${YELLOW}Running Critical Upgrade Blocker Checks (36-46)...${NC}"
         echo ""
         
-        # Check 36: chkpass Extension Check - Only for PG <= 11
-        if [ "$PG_MAJOR_VERSION" -le 11 ]; then
+        # Check 36: chkpass Extension Check - Only when target >= 11
+        if [ "$TARGET_VERSION" -ge 11 ]; then
             execute_check_all_dbs \
                 "chkpass Extension Check" \
                 "Check for chkpass extension (not supported in PostgreSQL >= 11) across all databases" \
@@ -5966,11 +6016,11 @@ Details: ${upgrade_targets}"
                 "${output_file}" \
                 "36"
         else
-            echo "Skipping Check 36 (chkpass Extension) - Not applicable for PostgreSQL > 11"
+            echo "Skipping Check 36 (chkpass Extension) - Not applicable when target version < 11"
         fi
         
-        # Check 37: tsearch2 Extension Check - Only for PG <= 11
-        if [ "$PG_MAJOR_VERSION" -le 11 ]; then
+        # Check 37: tsearch2 Extension Check - Only when target >= 11
+        if [ "$TARGET_VERSION" -ge 11 ]; then
             execute_check_all_dbs \
                 "tsearch2 Extension Check" \
                 "Check for tsearch2 extension (not supported in PostgreSQL >= 11) across all databases" \
@@ -5986,11 +6036,11 @@ Details: ${upgrade_targets}"
                 "${output_file}" \
                 "37"
         else
-            echo "Skipping Check 37 (tsearch2 Extension) - Not applicable for PostgreSQL > 11"
+            echo "Skipping Check 37 (tsearch2 Extension) - Not applicable when target version < 11"
         fi
         
-        # Check 38: pg_repack Extension Check - Only for PG <= 14
-        if [ "$PG_MAJOR_VERSION" -le 14 ]; then
+        # Check 38: pg_repack Extension Check - Only when target >= 14
+        if [ "$TARGET_VERSION" -ge 14 ]; then
             execute_check_all_dbs \
                 "pg_repack Extension Check" \
                 "Check for pg_repack extension (must be dropped before PostgreSQL >= 14) across all databases" \
@@ -6006,7 +6056,7 @@ Details: ${upgrade_targets}"
                 "${output_file}" \
                 "38"
         else
-            echo "Skipping Check 38 (pg_repack Extension) - Not applicable for PostgreSQL > 14"
+            echo "Skipping Check 38 (pg_repack Extension) - Not applicable when target version < 14"
         fi
         
         # Check 39: System-Defined Composite Types Check (all databases)
@@ -6108,8 +6158,8 @@ Details: ${upgrade_targets}"
             "${output_file}" \
             "39b"
         
-        # Check 40: aclitem Data Type Check - Only for PG <= 15 upgrading to >= 16 (all databases)
-        # Note: This check is always run but only critical if upgrading from PG <= 15 to PG >= 16
+        # Check 40: aclitem Data Type Check - Only for source PG <= 15 upgrading to target >= 16
+        if [ "$PG_MAJOR_VERSION" -le 15 ] && [ "$TARGET_VERSION" -ge 16 ]; then
         execute_check_all_dbs \
             "aclitem Data Type Check (PostgreSQL 16+ Incompatibility) - what to check: \"Your installation contains the 'aclitem' data type in user tables. The internal format of 'aclitem' changed in PostgreSQL version 16. Please drop the problem columns before upgrade\"" \
             "Check for aclitem data type in user tables (format changed in PostgreSQL 16). CRITICAL if upgrading from PG <= 15 to PG >= 16" \
@@ -6152,6 +6202,9 @@ Details: ${upgrade_targets}"
             ORDER BY n.nspname, c.relname, a.attname;" \
             "${output_file}" \
             "40"
+        else
+            echo "Skipping Check 40 (aclitem) - Only applicable when upgrading from PG <= 15 to PG >= 16"
+        fi
         
         # Check 41: sql_identifier Data Type Check - Only for PG < 12
         if [ "$PG_MAJOR_VERSION" -lt 12 ]; then
@@ -6277,8 +6330,8 @@ Details: ${upgrade_targets}"
             echo "Skipping Check 43 (Tables WITH OIDS) - Not applicable for PostgreSQL >= 12"
         fi
         
-        # Check 44: User-Defined Encoding Conversions - Only for PG <= 14
-        if [ "$PG_MAJOR_VERSION" -le 14 ]; then
+        # Check 44: User-Defined Encoding Conversions - Only for source PG < 14
+        if [ "$PG_MAJOR_VERSION" -le 13 ]; then
             execute_check_all_dbs \
                 "User-Defined Encoding Conversions Check - what to check: \"Your installation contains user-defined encoding conversions. The conversion function parameters changed in PostgreSQL version 14. Please remove the encoding conversions before upgrade.\"" \
                 "Check for user-defined encoding conversions (not supported in PostgreSQL >= 14)" \
@@ -6294,11 +6347,11 @@ Details: ${upgrade_targets}"
                 "${output_file}" \
                 "44"
         else
-            echo "Skipping Check 44 (User-Defined Encoding Conversions) - Not applicable for PostgreSQL > 14"
+            echo "Skipping Check 44 (User-Defined Encoding Conversions) - Not applicable for PostgreSQL > 13"
         fi
         
-        # Check 45: User-Defined Postfix Operators - Only for PG <= 14
-        if [ "$PG_MAJOR_VERSION" -le 14 ]; then
+        # Check 45: User-Defined Postfix Operators - Only for source PG < 14
+        if [ "$PG_MAJOR_VERSION" -le 13 ]; then
             execute_check_all_dbs \
                 "User-Defined Postfix Operators Check - what to check: \"Your installation contains user-defined postfix operators, which are not supported anymore. Consider dropping the postfix operators and replacing them with prefix operators or function calls.\"" \
                 "Check for user-defined postfix operators (not supported in PostgreSQL >= 14)" \
@@ -6315,45 +6368,40 @@ Details: ${upgrade_targets}"
                 "${output_file}" \
                 "45"
         else
-            echo "Skipping Check 45 (User-Defined Postfix Operators) - Not applicable for PostgreSQL > 14"
+            echo "Skipping Check 45 (User-Defined Postfix Operators) - Not applicable for PostgreSQL >= 14"
         fi
         
-        # Check 46: Incompatible Polymorphic Functions - Only for PG <= 14
-        if [ "$PG_MAJOR_VERSION" -le 14 ]; then
+        # Check 46: Incompatible Polymorphic Functions - Only for source PG < 14
+        if [ "$PG_MAJOR_VERSION" -le 13 ]; then
             execute_check_all_dbs \
                 "Incompatible Polymorphic Functions Check - what to check: \"Your installation contains user-defined objects that refer to internal polymorphic functions with arguments of type anyarray or anyelement. These user-defined objects must be dropped before upgrading and restored afterwards, changing them to refer to the new corresponding functions with arguments of type anycompatiblearray and anycompatible.\"" \
                 "Check for functions using old polymorphic types (anyarray/anyelement changed in PostgreSQL 14)" \
-                "SELECT 
-                    p.oid,
-                    p.proname AS function_name,
-                    n.nspname AS schema_name,
-                    pg_catalog.pg_get_function_identity_arguments(p.oid) AS arguments,
-                    'CRITICAL - Polymorphic function signature incompatible with PostgreSQL >= 14' AS issue
-                FROM pg_catalog.pg_proc p
-                JOIN pg_catalog.pg_namespace n ON p.pronamespace = n.oid
-                WHERE p.oid >= 16384
-                AND (
-                    -- Check for aggregates with anyarray/anyelement
-                    (p.prokind = 'a' AND (
-                        p.proargtypes::text ~ '2277' OR  -- anyarray
-                        p.proargtypes::text ~ '2283'     -- anyelement
-                    ))
-                    OR
-                    -- Check for operators with polymorphic types
-                    EXISTS (
-                        SELECT 1 FROM pg_catalog.pg_operator o
-                        WHERE (o.oprcode = p.oid OR o.oprrest = p.oid OR o.oprjoin = p.oid)
-                        AND (
-                            o.oprleft::text ~ '2277|2283' OR
-                            o.oprright::text ~ '2277|2283'
-                        )
-                    )
-                )
-                ORDER BY n.nspname, p.proname;" \
+                "SELECT n.nspname AS schema_name,
+                        p.proname AS object_name,
+                        pg_catalog.pg_get_function_identity_arguments(p.oid) AS arguments,
+                        'CRITICAL - Aggregate refers to pre-14 polymorphic builtin (rebuild with anycompatible)' AS issue
+                 FROM pg_catalog.pg_proc p
+                 JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+                 JOIN pg_catalog.pg_aggregate a ON a.aggfnoid = p.oid
+                 WHERE p.oid >= 16384
+                   AND (a.aggtransfn = ANY(ARRAY['array_append(anyarray,anyelement)','array_cat(anyarray,anyarray)','array_prepend(anyelement,anyarray)','array_remove(anyarray,anyelement)','array_replace(anyarray,anyelement,anyelement)','array_position(anyarray,anyelement)','array_position(anyarray,anyelement,integer)','array_positions(anyarray,anyelement)','width_bucket(anyelement,anyarray)']::regprocedure[])
+                        OR a.aggfinalfn = ANY(ARRAY['array_append(anyarray,anyelement)','array_cat(anyarray,anyarray)','array_prepend(anyelement,anyarray)','array_remove(anyarray,anyelement)','array_replace(anyarray,anyelement,anyelement)','array_position(anyarray,anyelement)','array_position(anyarray,anyelement,integer)','array_positions(anyarray,anyelement)','width_bucket(anyelement,anyarray)']::regprocedure[]))
+                   AND a.aggtranstype = ANY(ARRAY['anyarray','anyelement']::regtype[])
+                 UNION ALL
+                 SELECT n.nspname AS schema_name,
+                        op.oprname AS object_name,
+                        pg_catalog.format_type(op.oprleft, NULL) AS arguments,
+                        'CRITICAL - Operator refers to pre-14 polymorphic builtin (rebuild with anycompatible)' AS issue
+                 FROM pg_catalog.pg_operator op
+                 JOIN pg_catalog.pg_namespace n ON n.oid = op.oprnamespace
+                 WHERE op.oid >= 16384
+                   AND op.oprcode = ANY(ARRAY['array_append(anyarray,anyelement)','array_cat(anyarray,anyarray)','array_prepend(anyelement,anyarray)','array_remove(anyarray,anyelement)','array_replace(anyarray,anyelement,anyelement)','array_position(anyarray,anyelement)','array_position(anyarray,anyelement,integer)','array_positions(anyarray,anyelement)','width_bucket(anyelement,anyarray)']::regprocedure[])
+                   AND op.oprleft = ANY(ARRAY['anyarray','anyelement']::regtype[])
+                 ORDER BY 1, 2;" \
                 "${output_file}" \
                 "46"
         else
-            echo "Skipping Check 46 (Incompatible Polymorphic Functions) - Not applicable for PostgreSQL > 14"
+            echo "Skipping Check 46 (Incompatible Polymorphic Functions) - Not applicable for PostgreSQL > 13"
         fi
         
         # Check 47: Invalid Logical Replication Slots - Only for PG >= 17
@@ -6468,7 +6516,8 @@ Details: ${upgrade_targets}"
             "${output_file}" \
             "49"
 
-        # Check 50: NOT NULL Inheritance Mismatch (all versions)
+        # Check 50: NOT NULL Inheritance Mismatch - Only when target >= 18
+        if [ "$TARGET_VERSION" -ge 18 ]; then
         execute_check_all_dbs \
             "NOT NULL Inheritance Mismatch Check - what to check: \"Your installation contains child tables that omit NOT NULL constraints present in their parent tables. This will cause pg_upgrade to fail when upgrading to PostgreSQL 18+. Fix with: ALTER TABLE child ALTER COLUMN col SET NOT NULL.\"" \
             "Check for child tables missing NOT NULL constraints that parent tables have" \
@@ -6491,9 +6540,12 @@ Details: ${upgrade_targets}"
             ORDER BY nc.nspname, cc.relname, ac.attname;" \
             "${output_file}" \
             "50"
+        else
+            echo "Skipping Check 50 (NOT NULL Inheritance) - Not applicable when target version < 18"
+        fi
         
-        # Check 51: Unicode-Dependent Objects - Only for PG >= 17 (WARNING only)
-        if [ "$PG_MAJOR_VERSION" -ge 17 ]; then
+        # Check 51: Unicode-Dependent Objects - Only when source >= 17 and target >= 18 (WARNING only)
+        if [ "$PG_MAJOR_VERSION" -ge 17 ] && [ "$TARGET_VERSION" -ge 18 ]; then
             execute_check_all_dbs \
                 "Unicode-Dependent Objects Check" \
                 "Check for indexes/partitions/constraints using Unicode-dependent functions (lower, upper, initcap, regexp_*). If Unicode version differs between old and new clusters, consider REINDEX after upgrade." \
@@ -6522,7 +6574,7 @@ Details: ${upgrade_targets}"
                 "${output_file}" \
                 "51"
         else
-            echo "Skipping Check 51 (Unicode-Dependent Objects) - Not applicable for PostgreSQL < 17"
+            echo "Skipping Check 51 (Unicode-Dependent Objects) - Not applicable unless source >= 17 and target >= 18"
         fi
         
         # Close the checks table (HTML only)
