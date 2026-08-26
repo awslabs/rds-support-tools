@@ -490,20 +490,20 @@ BEGIN
     RAISE NOTICE '';
 
     -- --------------------------------------------
-    -- Check 13. Replication slots [global]
+    -- Check 13. Logical Replication slots [global]
     -- --------------------------------------------
     v_detail := '';
-    RAISE NOTICE '=== 13. check_for_replication_slots [global] ===';
+    RAISE NOTICE '=== 13. check_for_logical_replication_slots [global] ===';
     IF v_need_slot_check THEN
-        SELECT count(*) INTO v_count FROM pg_catalog.pg_replication_slots;
+        SELECT count(*) INTO v_count FROM pg_catalog.pg_replication_slots WHERE slot_type='logical';
         IF v_count > 0 THEN
             v_status := '❌ FAILED';
-            v_msg := v_count || ' replication slot(s) found. Drop all logical replication slots and try again.';
+            v_msg := v_count || ' logical replication slot(s) found. Drop all logical replication slots and try again.';
             SELECT string_agg(slot_name || ' (' || slot_type || ', ' || COALESCE(database, 'N/A') || ')', E'\n    ')
-            INTO v_detail FROM pg_catalog.pg_replication_slots;
+            INTO v_detail FROM pg_catalog.pg_replication_slots WHERE slot_type='logical';
         ELSE
             v_status := '✓ PASSED';
-            v_msg := 'No replication slots found.';
+            v_msg := 'No logical replication slots found.';
         END IF;
     ELSE
         v_status := '- SKIP';
