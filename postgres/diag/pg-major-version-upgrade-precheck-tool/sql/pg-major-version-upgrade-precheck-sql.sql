@@ -461,16 +461,16 @@ WHERE state != 'idle'
 \echo ''
 
 -- --------------------------------------------
--- Check 13. check_for_replication_slots [global]
+-- Check 13. check_for_logical_replication_slots [global]
 -- --------------------------------------------
-\echo '=== 13. check_for_replication_slots [global] ==='
+\echo '=== 13. check_for_logical_replication_slots [global] ==='
 \if :need_slot_check
     SELECT (count(*) > 0)::text AS c13_failed,
            CASE WHEN count(*) > 0
-                THEN '❌ FAILED: ' || count(*) || ' replication slot(s) found. Drop all logical replication slots and try again.'
+                THEN '❌ FAILED: ' || count(*) || ' logical replication slot(s) found. Drop all logical replication slots and try again.'
                 ELSE '✓ PASSED'
            END AS c13_status
-    FROM pg_catalog.pg_replication_slots \gset
+    FROM pg_catalog.pg_replication_slots WHERE slot_type='logical' \gset
 
     \echo :c13_status
 

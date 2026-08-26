@@ -5193,19 +5193,19 @@ EOF
             "${output_file}" \
             "12"
         
-        # Check 13: Replication Slots Check - Only for source PG < 17 (17+ can migrate logical slots)
+        # Check 13: Logical Replication Slots Check - Only for source PG < 17 (17+ can migrate logical slots)
         if [ "$PG_MAJOR_VERSION" -lt 17 ]; then
         execute_check \
-            "Replication Slots Check - what to check: \"Upgrade fails if logical replication slots exist. Drop logical slots before upgrade.\"" \
-            "Check for existing replication slots" \
+            "Logical Replication Slots Check - what to check: \"Upgrade fails if logical replication slots exist. Drop logical slots before upgrade.\"" \
+            "Check for existing logical replication slots" \
             "-- Count total slots
-            SELECT COUNT(*) AS slot_count FROM pg_catalog.pg_replication_slots;
-            -- Check for existing replication slots
-            SELECT slot_name, plugin, slot_type, database, active, active_pid, xmin, catalog_xmin, restart_lsn, confirmed_flush_lsn FROM pg_replication_slots;" \
+            SELECT COUNT(*) AS slot_count FROM pg_catalog.pg_replication_slots WHERE slot_type='logical';
+            -- Check for existing logical replication slots
+            SELECT slot_name, plugin, slot_type, database, active, active_pid, xmin, catalog_xmin, restart_lsn, confirmed_flush_lsn FROM pg_replication_slots WHERE slot_type='logical';" \
             "${output_file}" \
             "13"
         else
-            echo "Skipping Check 13 (Replication Slots) - PostgreSQL 17+ supports logical slot migration"
+            echo "Skipping Check 13 (Logical Replication Slots) - PostgreSQL 17+ supports logical slot migration"
         fi
         
         # Check 14: Database Configuration Parameters
