@@ -111,7 +111,7 @@ jobs:
             echo ""
             echo "| File Path | Peak Views (14d) | Peak Uniques (14d) | Days in Top 10 |"
             echo "|-----------|----------------:|-------------------:|---------------:|"
-            echo "$PATH_TABLE" | jq -r '.[] | "| \`\(.path)\` | \(.peak_views_14d) | \(.peak_uniques_14d) | \(.days_in_top10) |"'
+            echo "$PATH_TABLE" | jq -r '.[] | "| `\(.path)` | \(.peak_views_14d) | \(.peak_uniques_14d) | \(.days_in_top10) |"'
             echo ""
             echo "## Recent Daily Activity (last 30 days)"
             echo ""
