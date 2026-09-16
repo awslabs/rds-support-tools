@@ -1585,15 +1585,6 @@ add_check_result() {
     local status=$5
     local check_id=$6
     
-    # Special handling for Check 26: Override status based on result content
-    if [ "$check_id" = "26" ]; then
-        if echo "${result}" | grep -q "CRITICAL"; then
-            status="WARNING"
-        elif echo "${result}" | grep -q "WARNING"; then
-            status="WARNING"
-        fi
-    fi
-    
     # Extract "what to check" from check_name if it exists
     local display_name="${check_name}"
     local what_to_check=""
@@ -1912,7 +1903,7 @@ get_all_databases() {
     local psql_err
     psql_err=$(mktemp)
     ALL_DATABASES=$(echo "SELECT datname FROM pg_database WHERE datistemplate = false AND datallowconn = true AND datname NOT IN ('rdsadmin') ORDER BY datname;" | \
-        PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -A 2>"${psql_err}")
+        PGPASSWORD="${DB_PASS}" psql -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -A 2>"${psql_err}")
     local _rc=$?
     if [ ${_rc} -ne 0 ]; then
         echo -e "${RED}ERROR: Failed to retrieve database list: $(cat "${psql_err}")${NC}" >&2
@@ -1963,7 +1954,7 @@ execute_check_all_dbs() {
         local db_result
         local psql_err
         psql_err=$(mktemp)
-        db_result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${db}" -t -A 2>"${psql_err}")
+        db_result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${db}" -t -A 2>"${psql_err}")
         local _rc=$?
 
         if [ ${_rc} -ne 0 ]; then
@@ -2000,7 +1991,7 @@ ${db_result}
     # Critical upgrade blockers should be ERROR, not WARNING, when issues are found
     local base_check="${check_name%% - what to check:*}"
     case "${base_check}" in
-        "chkpass Extension Check"|"tsearch2 Extension Check"|"pg_repack Extension Check"|"System-Defined Composite Types in User Tables"|"aclitem Data Type Check (PostgreSQL 16+ Incompatibility)"|"sql_identifier Data Type Check (PostgreSQL 12+ Incompatibility)"|"Removed Data Types Check (abstime, reltime, tinterval)"|"Tables WITH OIDS Check"|"User-Defined Encoding Conversions Check"|"User-Defined Postfix Operators Check"|"Incompatible Polymorphic Functions Check"|"reg* Data Types in User Tables Check"|"Database Connection Settings Check"|"Invalid Logical Replication Slots Check"|"Inactive Logical Slots with Unconsumed WAL Check"|"Subscription State Check"|"NOT NULL Inheritance Mismatch Check")
+        "chkpass Extension Check"|"tsearch2 Extension Check"|"pg_repack Extension Check"|"System-Defined Composite Types in User Tables"|"aclitem Data Type Check (PostgreSQL 16+ Incompatibility)"|"sql_identifier Data Type Check (PostgreSQL 12+ Incompatibility)"|"Removed Data Types Check (abstime, reltime, tinterval)"|"Tables WITH OIDS Check"|"User-Defined Encoding Conversions Check"|"User-Defined Postfix Operators Check"|"Incompatible Polymorphic Functions Check"|"reg* Data Types in User Tables Check"|"Database Connection Settings Check"|"Invalid Logical Replication Slots Check"|"Inactive Logical Slots with Unconsumed WAL Check"|"Subscription State Check"|"NOT NULL Inheritance Mismatch Check"|"DTS Trigger Check"|"Table Requirements for Blue/Green Deployments"|"Publications Check for Blue/Green Deployments")
             if [ "${status}" = "WARNING" ]; then
                 status="ERROR"
             fi
@@ -2009,7 +2000,7 @@ ${db_result}
 
     # Informational checks are always INFO regardless of row count, but preserve ERROR
     case "${base_check}" in
-        "Object Count Check"|"Top 20 Largest Tables"|"Unused Indexes Analysis"|"Schema Usage")
+        "Object Count Check"|"Top 20 Largest Tables"|"Unused Indexes Analysis"|"Schema Usage"|"Partitioned Tables Check for Blue/Green Deployments")
             if [ "${status}" != "ERROR" ]; then
                 status="INFO"
             fi
@@ -4305,22 +4296,24 @@ check_invalid_databases() {
     echo "Running: ${check_name}..."
     
     local result
-    result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" 2>&1 || echo "ERROR")    
+    result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" 2>&1)    
+    local rc=$?
     local status="SUCCESS"
     
-    # Check for SQL errors first
-    if echo "${result}" | grep -q "ERROR"; then
+    # Check for SQL/connection errors first (psql exit code, not substring match)
+    if [ "$rc" -ne 0 ]; then
         status="ERROR"
     else
-        # Count result rows (excluding header and footer lines)
+        # Count result rows using psql's own "(N rows)" footer (robust, no line-offset magic)
         local row_count=0
         if [ -n "${result}" ]; then
-            row_count=$(echo "${result}" | grep -v "^-" | grep -v "^(" | grep -v "^ *$" | tail -n +3 | wc -l | tr -d ' ')
+            row_count=$(echo "${result}" | grep -oE '\([0-9]+ row' | tail -1 | grep -oE '[0-9]+')
+            row_count=${row_count:-0}
         fi
         
-        # If any invalid databases found, mark as WARNING
+        # If any invalid databases found, mark as ERROR (invalid DB blocks pg_upgrade)
         if [ "$row_count" -gt 0 ]; then
-            status="WARNING"
+            status="ERROR"
         else
             status="SUCCESS"
         fi
@@ -4349,11 +4342,12 @@ check_database_age() {
     echo "Running: ${check_name}..."
     
     local result
-    result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" 2>&1 || echo "ERROR")    
+    result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" 2>&1)    
+    local rc=$?
     local status="SUCCESS"
     
-    # Check for SQL errors first
-    if echo "${result}" | grep -q "ERROR"; then
+    # Check for SQL/connection errors first (psql exit code, not substring match)
+    if [ "$rc" -ne 0 ]; then
         status="ERROR"
     else
         # Check if any row contains WARNING or CRITICAL in the status column
@@ -4398,11 +4392,12 @@ execute_check() {
     # echo "FUNCTION ENTRY: execute_check called with check_id=${check_id}" >&2
     
     local result
-    result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" 2>&1 || echo "ERROR")    
+    result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" 2>&1)    
+    local rc=$?
     local status="SUCCESS"
     
-    # Check for SQL errors first
-    if echo "${result}" | grep -q "ERROR"; then
+    # Check for SQL/connection errors first (psql exit code, not substring match)
+    if [ "$rc" -ne 0 ]; then
         status="ERROR"
     else
         # Extract just the check name without "what to check" suffix
@@ -4411,7 +4406,7 @@ execute_check() {
         # For multi-query checks, extract only the first query result
         local first_result="${result}"
         case "${base_check_name}" in
-            "Replication Slots Check"|"Views Dependent on System Catalogs"|"Uncommitted Prepared Transactions"|"Unsupported Data Types Check (reg* Types)"|"Large Objects Check")
+            "Logical Replication Slots Check"|"Views Dependent on System Catalogs"|"Uncommitted Prepared Transactions"|"Large Objects Check")
                 # Extract only the first query result (up to the first row count line)
                 first_result=$(echo "${result}" | awk '/^\([0-9]+ row/ {exit} {print}')
                 ;;
@@ -4420,8 +4415,9 @@ execute_check() {
         # Count result rows (excluding header and footer lines)
         local row_count=0
         if [ -n "${first_result}" ]; then
-            # Count lines that are not headers, separators, or row count footer
-            row_count=$(echo "${first_result}" | grep -v "^-" | grep -v "^(" | grep -v "^ *$" | tail -n +3 | wc -l | tr -d ' ')
+            # Count result rows using psql's own "(N rows)" footer (robust, no line-offset magic)
+            row_count=$(echo "${first_result}" | grep -oE '\([0-9]+ row' | tail -1 | grep -oE '[0-9]+')
+            row_count=${row_count:-0}
         fi
         
         case "${base_check_name}" in
@@ -4502,7 +4498,7 @@ execute_check() {
                 fi
                 ;;
             
-            "Replication Slots Check"|"Uncommitted Prepared Transactions"|"Unsupported Data Types Check (reg* Types)")
+            "Logical Replication Slots Check"|"Uncommitted Prepared Transactions")
                 # These are upgrade blockers — ERROR if count > 0
                 local count_value
                 count_value=$(echo "${first_result}" | grep -E "^[[:space:]]*[0-9]+[[:space:]]*$" | tr -d ' ')
@@ -4540,8 +4536,8 @@ execute_check() {
                 fi
                 ;;
             
-            "Database Connection Settings Check")
-                # Error if databases don't allow connections - upgrade will fail
+            "Database Connection Settings Check"|"Subscriptions Check for Blue/Green Deployments")
+                # Error if databases don't allow connections, or a subscription exists (blue can't be a subscriber) - upgrade/BG will fail
                 if [ "$row_count" -gt 0 ]; then
                     status="ERROR"
                 else
@@ -5093,7 +5089,7 @@ EOF
         
         
         # Check 8: Invalid Indexes
-        execute_check \
+        execute_check_all_dbs \
             "Invalid Indexes Check - what to check: \"Invalid indexes are the indexes that are not currently being used by the query planner. Dropping the indexes will save disk space and reduce time during vacuum operations post upgrade.\"" \
             "Check for invalid or corrupted indexes that need to be rebuilt" \
             "SELECT 
@@ -5112,7 +5108,7 @@ EOF
             "8"
         
         # Check 9: Duplicate Indexes
-        execute_check \
+        execute_check_all_dbs \
             "Duplicate Indexes Detection - what to check: \"Post-upgrade maintenance operations like VACUUM and ANALYZE take longer with duplicate indexes, as each index must be processed separately.\"" \
             "Find duplicate indexes that can be removed to improve performance" \
             "WITH index_details AS (
@@ -5120,17 +5116,18 @@ EOF
                     schemaname,
                     tablename,
                     indexname,
-                    indexdef
+                    indexdef,
+                    regexp_replace(indexdef, '(INDEX )[^ ]+( ON )', '\1\2') AS norm_def
                 FROM pg_indexes
                 WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
             )
             SELECT 
                 tablename,
                 array_agg(indexname) AS duplicate_indexes,
-                indexdef AS index_definition,
+                min(indexdef) AS index_definition,
                 COUNT(*) AS duplicate_count
             FROM index_details
-            GROUP BY tablename, indexdef
+            GROUP BY tablename, norm_def
             HAVING COUNT(*) > 1
             ORDER BY tablename, duplicate_count DESC;" \
             "${output_file}" \
@@ -5155,7 +5152,7 @@ EOF
             "10"
         
         # Check 11: Table Bloat Estimation
-        execute_check \
+        execute_check_all_dbs \
             "Table Bloat Analysis" \
             "If a table is bloated, consider running VACUUM, as bloated tables can significantly impact post-upgrade performance." \
             "SELECT 
@@ -5248,90 +5245,33 @@ EOF
         else
         
         # Define extension recommendations
-        local PRE_UPGRADE_EXTENSIONS="
-postgis|Must be upgraded to latest version before upgrade|pre
-postgis_topology|Must be upgraded with PostGIS before upgrade|pre
-postgis_tiger_geocoder|Must be upgraded with PostGIS before upgrade|pre
-address_standardizer|Must be upgraded with PostGIS before upgrade|pre
-address_standardizer_data_us|Must be upgraded with PostGIS before upgrade|pre
-pg_repack|Must be upgraded before major version upgrade|pre
-pglogical|Must be upgraded or removed before upgrade|pre
-pg_hint_plan|Check compatibility with target version|pre
-pg_stat_statements|Should be at latest version|pre
-pgaudit|Must match target PostgreSQL version|pre
-pg_cron|Must be upgraded before upgrade|pre
-pg_partman|Should be upgraded before upgrade|pre
-pg_tle|Must be upgraded before upgrade|pre
-"
-        local POST_UPGRADE_EXTENSIONS="
-plpgsql|Automatically upgraded|post
-uuid-ossp|Can be upgraded after|post
-hstore|Can be upgraded after|post
-citext|Can be upgraded after|post
-ltree|Can be upgraded after|post
-pg_trgm|Can be upgraded after|post
-fuzzystrmatch|Can be upgraded after|post
-tablefunc|Can be upgraded after|post
-pgcrypto|Can be upgraded after|post
-btree_gist|Can be upgraded after|post
-btree_gin|Can be upgraded after|post
-intarray|Can be upgraded after|post
-earthdistance|Can be upgraded after|post
-cube|Can be upgraded after|post
-bloom|Can be upgraded after|post
-pg_buffercache|Can be upgraded after|post
-pg_prewarm|Can be upgraded after|post
-"
-        
         local ext_result=""
-        local recommendations=""
-        local has_pre_upgrade=false
-        local has_post_upgrade=false
+        local ext_error=false
         
         while IFS= read -r db; do
             [ -z "$db" ] && continue
             local db_ext
             db_ext=$(echo "SELECT current_database() AS database_name, extname AS extension_name, extversion AS installed_version, a.default_version AS available_version, CASE WHEN a.default_version IS NULL THEN 'UNAVAILABLE' WHEN e.extversion <> a.default_version THEN 'UPDATE REQUIRED' ELSE 'OK' END AS status, nspname AS schema FROM pg_extension e LEFT JOIN pg_available_extensions a ON e.extname = a.name JOIN pg_namespace ON e.extnamespace = pg_namespace.oid WHERE nspname NOT IN ('pg_catalog','information_schema') ORDER BY CASE WHEN a.default_version IS NULL THEN 0 WHEN e.extversion <> a.default_version THEN 1 ELSE 2 END, extname;" | \
-                PGPASSWORD="${DB_PASS}" psql -t -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${db}" 2>&1)
+                PGPASSWORD="${DB_PASS}" psql -v ON_ERROR_STOP=1 -t -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${db}" 2>&1)
+            if [ $? -ne 0 ]; then
+                ext_error=true
+            fi
             
             if [ -n "${db_ext}" ]; then
                 ext_result="${ext_result}-- Database: ${db}
 ${db_ext}
 
 "
-                # Check for pre-upgrade extensions in this DB
-                while IFS='|' read -r ext_name ext_rec ext_type; do
-                    if [ -n "$ext_name" ] && [ "$ext_type" = "pre" ]; then
-                        if echo "${db_ext}" | grep -qi "[[:space:]]${ext_name}[[:space:]]"; then
-                            recommendations="${recommendations}\n⚠️  [${db}] ${ext_name}: ${ext_rec}"
-                            has_pre_upgrade=true
-                        fi
-                    fi
-                done <<< "$PRE_UPGRADE_EXTENSIONS"
-                
-                # Check for post-upgrade extensions
-                while IFS='|' read -r ext_name ext_rec ext_type; do
-                    if [ -n "$ext_name" ] && [ "$ext_type" = "post" ]; then
-                        if echo "${db_ext}" | grep -qi "[[:space:]]${ext_name}[[:space:]]"; then
-                            recommendations="${recommendations}\n✓  [${db}] ${ext_name}: ${ext_rec}"
-                            has_post_upgrade=true
-                        fi
-                    fi
-                done <<< "$POST_UPGRADE_EXTENSIONS"
             fi
         done <<< "${ALL_DATABASES}"
         
-        if [ "$has_pre_upgrade" = true ] || [ "$has_post_upgrade" = true ]; then
-            ext_result="${ext_result}
-=== EXTENSION UPGRADE RECOMMENDATIONS ===
-$(echo -e "${recommendations}" | sed 's/^/  /')
-"
-        fi
-        
+        # WARNING only when an extension actually needs action (per the SQL status column),
+        # not merely because its name is in a hardcoded list. pg_repack drop is handled by
+        # Check 38 (ERROR); outdated versions by Check 15b.
         local status="SUCCESS"
-        if echo "${ext_result}" | grep -q "^ERROR"; then
+        if [ "$ext_error" = true ]; then
             status="ERROR"
-        elif [ "$has_pre_upgrade" = true ]; then
+        elif echo "${ext_result}" | grep -qE "UPDATE REQUIRED|UNAVAILABLE"; then
             status="WARNING"
         fi
         
@@ -5366,7 +5306,7 @@ $(echo -e "${recommendations}" | sed 's/^/  /')
             "15b"
         
         # Check 16: Views Dependent on System Catalogs
-        execute_check \
+        execute_check_all_dbs \
             "Views Dependent on System Catalogs - what to check: \"PostgreSQL objects may malfunction or exhibit altered behavior following major version upgrades due to changes in internal system catalogs. As a precautionary measure, drop and recreate views dependent on system catalogs post-upgrade.\"" \
             "Check for views dependent on system catalogs that may have changed" \
             "-- Check for views dependent on pg_stat_activity
@@ -5393,16 +5333,7 @@ $(echo -e "${recommendations}" | sed 's/^/  /')
             JOIN pg_class AS source_table ON pg_depend.refobjid = source_table.oid
             JOIN pg_namespace AS dependent_ns ON dependent_ns.oid = dependent_view.relnamespace
             WHERE source_table.relname = 'pg_constraint'
-                AND dependent_ns.nspname NOT IN ('pg_catalog', 'information_schema');
-            -- List all user-created views
-            SELECT 
-                schemaname,
-                viewname,
-                viewowner,
-                LEFT(definition, 200) AS definition_preview
-            FROM pg_views
-            WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
-            ORDER BY schemaname, viewname;" \
+                AND dependent_ns.nspname NOT IN ('pg_catalog', 'information_schema');" \
             "${output_file}" \
             "16"
         
@@ -5443,72 +5374,21 @@ $(echo -e "${recommendations}" | sed 's/^/  /')
             "${output_file}" \
             "18"
         
-        # Check 19: Unsupported Data Types (reg* Types)
-        execute_check \
-            "Unsupported Data Types Check (reg* Types) - what to check: \"Certain OID-referencing data types in the reg* family—excluding regclass, regrole, and regtype—prevent PostgreSQL upgrades from proceeding. Based on business requirements, you may need to drop and recreate objects using these types post-upgrade.\"" \
-            "Check for unsupported reg* data types" \
-            "-- Count unsupported types
-            SELECT COUNT(*) AS unsupported_type_count 
-            FROM pg_catalog.pg_class c 
-            JOIN pg_catalog.pg_namespace n ON c.relnamespace = n.oid 
-            JOIN pg_catalog.pg_attribute a ON c.oid = a.attrelid 
-            WHERE NOT a.attisdropped 
-                AND a.atttypid IN ( 
-                    SELECT t.oid FROM pg_catalog.pg_type t
-                    WHERE t.typnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = 'pg_catalog')
-                      AND t.typname IN ('regcollation','regconfig','regdictionary','regnamespace',
-                                        'regoper','regoperator','regproc','regprocedure')
-                ) 
-                AND c.relkind IN ('r', 'm', 'i')
-                AND n.nspname !~ '^pg_temp_'
-                AND n.nspname !~ '^pg_toast_temp_'
-                AND n.nspname NOT IN ('pg_catalog', 'information_schema');
-            -- Check for unsupported reg* data types 
-            SELECT 
-                n.nspname AS schema_name, 
-                c.relname AS table_name, 
-                a.attname AS column_name, 
-                pg_catalog.format_type(a.atttypid, a.atttypmod) AS data_type 
-            FROM pg_catalog.pg_class c 
-            JOIN pg_catalog.pg_namespace n ON c.relnamespace = n.oid 
-            JOIN pg_catalog.pg_attribute a ON c.oid = a.attrelid 
-            WHERE NOT a.attisdropped 
-                AND a.atttypid IN ( 
-                    SELECT t.oid FROM pg_catalog.pg_type t
-                    WHERE t.typnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = 'pg_catalog')
-                      AND t.typname IN ('regcollation','regconfig','regdictionary','regnamespace',
-                                        'regoper','regoperator','regproc','regprocedure')
-                ) 
-                AND c.relkind IN ('r', 'm', 'i')
-                AND n.nspname !~ '^pg_temp_'
-                AND n.nspname !~ '^pg_toast_temp_'
-                AND n.nspname NOT IN ('pg_catalog', 'information_schema') 
-            ORDER BY n.nspname, c.relname, a.attname;" \
-            "${output_file}" \
-            "19"
         
         # Check 20: Large Objects Check
-        execute_check \
+        execute_check_all_dbs \
             "Large Objects Check - what to check: \"Excessive large objects can cause OOM during upgrade. For 100,000 - 1,000,000 objects, consider larger instance class. Test upgrade using snapshot first.\"" \
             "Check for large objects that may impact upgrade performance" \
-            "-- Count large objects
-            SELECT COUNT(*) AS large_object_count 
-            FROM pg_largeobject_metadata;
-            -- Check large object table size
-            SELECT pg_size_pretty(pg_total_relation_size('pg_largeobject')) AS lo_table_size;
-            -- Check for orphaned large objects
-            SELECT lo.oid AS orphaned_lo
-            FROM pg_largeobject_metadata lo
-            WHERE NOT EXISTS (
-                SELECT 1 FROM pg_depend d 
-                WHERE d.objid = lo.oid
-            );" \
+            "-- WARNING only when a database has more than 100,000 large objects (may cause OOM during upgrade); pg_largeobject is per-database
+            SELECT count(*) || ' large objects, ' || pg_size_pretty(pg_total_relation_size('pg_largeobject')) || ' ' AS large_objects
+            FROM pg_largeobject_metadata
+            HAVING count(*) > 100000;" \
             "${output_file}" \
             "20"
         
         # Check 21: Unknown Data Type Check (PostgreSQL 9.6 → 10+) - Only for PG < 10
         if [ "$PG_MAJOR_VERSION" -lt 10 ]; then
-            execute_check \
+            execute_check_all_dbs \
                 "Unknown Data Type Check (PostgreSQL 9.6 → 10+) - what to check: \"'unknown' data type not supported in PostgreSQL 10+\"" \
                 "Check for columns with unknown data type" \
                 "-- Find columns with unknown data type
@@ -5742,7 +5622,7 @@ Details: ${upgrade_targets}"
             "25"
         
         # Check 26: Table Requirements for Blue/Green Deployments
-        execute_check \
+        execute_check_all_dbs \
             "Table Requirements for Blue/Green Deployments - what to check: \"Tables without primary keys or REPLICA IDENTITY FULL cannot be replicated in blue/green deployments. Add primary keys or set REPLICA IDENTITY FULL for affected tables.\"" \
             "Verify all tables have primary keys or REPLICA IDENTITY FULL (required for logical replication)" \
             "WITH no_primary_key_or_replica_identity AS (
@@ -5794,7 +5674,7 @@ Details: ${upgrade_targets}"
             "26"
         
         # Check 27: Foreign Tables Check for Blue/Green Deployments
-        execute_check \
+        execute_check_all_dbs \
             "Foreign Tables Check for Blue/Green Deployments - what to check: \"These tables will not be replicated using blue/green deployments but will not break replication.\"" \
             "List foreign tables that will not be replicated during blue/green deployment" \
             "SELECT 
@@ -5807,7 +5687,7 @@ Details: ${upgrade_targets}"
             "27"
         
         # Check 28: Unlogged Tables Check for Blue/Green Deployments
-        execute_check \
+        execute_check_all_dbs \
             "Unlogged Tables Check for Blue/Green Deployments - what to check: \"Unlogged tables are not replicated to green environment\"" \
             "Check for unlogged tables that will not be replicated during blue/green deployment" \
             "SELECT 
@@ -5825,7 +5705,7 @@ Details: ${upgrade_targets}"
             "28"
         
         # Check 29: Publications Check for Blue/Green Deployments
-        execute_check \
+        execute_check_all_dbs \
             "Publications Check for Blue/Green Deployments - what to check: \"The blue DB instance can't be a logical source (publisher) or replica (subscriber).\"" \
             "Check for publications - blue instance cannot be a logical publisher" \
             "SELECT 
@@ -5853,7 +5733,7 @@ Details: ${upgrade_targets}"
             "30"
         
         # Check 31: Foreign Data Wrapper Endpoint Check for Blue/Green Deployments
-        execute_check \
+        execute_check_all_dbs \
             "Foreign Data Wrapper Endpoint Check for Blue/Green Deployments - what to check: \"If the blue DB instance is configured as the foreign server of a foreign data wrapper (FDW) extension, you must use the instance endpoint name instead of IP addresses. This allows the configuration to remain functional after switchover.\"" \
             "Check if FDW uses endpoint names instead of IP addresses" \
             "SELECT 
@@ -5868,7 +5748,7 @@ Details: ${upgrade_targets}"
             "31"
         
         # Check 32: High Write Volume Tables Check for Blue/Green Deployments
-        execute_check \
+        execute_check_all_dbs \
             "High Write Volume Tables Check for Blue/Green Deployments - what to check: \"The logical replication apply process in the green environment is single-threaded. If the blue environment generates a high volume of write traffic, the green environment might not be able to keep up. This can lead to replication lag or failure, especially for workloads that produce continuous high write throughput. Make sure to test your workloads thoroughly. For scenarios that require major version upgrades and handling high-volume write workloads, consider alternative approaches such as using AWS Database Migration Service (AWS DMS).\"" \
             "Check for tables with high write volume (>1,000,000 writes)" \
             "SELECT 
@@ -5878,19 +5758,17 @@ Details: ${upgrade_targets}"
                 n_tup_ins AS inserts,
                 n_tup_upd AS updates,
                 n_tup_del AS deletes,
-                CASE 
-                    WHEN (n_tup_ins + n_tup_upd + n_tup_del) > 1000000 THEN 'WARNING - High write volume table'
-                    ELSE 'OK'
-                END AS issue
+                'WARNING - High write volume table (>1,000,000 writes)' AS issue
             FROM pg_stat_user_tables
             WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
+                AND (n_tup_ins + n_tup_upd + n_tup_del) > 1000000
             ORDER BY total_writes DESC
             LIMIT 20;" \
             "${output_file}" \
             "32"
         
         # Check 33: Partitioned Tables Check for Blue/Green Deployments
-        execute_check \
+        execute_check_all_dbs \
             "Partitioned Tables Check for Blue/Green Deployments - what to check: \"Creating new partitions on partitioned tables isn't supported during blue/green deployments for RDS for PostgreSQL. Creating new partitions involves data definition language (DDL) operations such as CREATE TABLE, which aren't replicated from the blue environment to the green environment. However, existing partitioned tables and their data will be replicated to the green environment.\"" \
             "Check for partitioned tables - new partition creation not supported during deployment" \
             "SELECT 
@@ -5913,8 +5791,8 @@ Details: ${upgrade_targets}"
             "33"
         
         # Check 34: Blue/Green Extension Compatibility Check
-        execute_check \
-            "Blue/Green Extension Compatibility Check - what to check: \"The following limitations apply to PostgreSQL extensions: The pg_partman extension must be disabled in the blue environment when you create a blue/green deployment. The extension performs DDL operations such as CREATE TABLE, which break logical replication from the blue environment to the green environment. The pg_cron extension must remain disabled on all green databases after the blue/green deployment is created. The extension has background workers that run as superuser and bypass the read-only setting of the green environment, which might cause replication conflicts. The pglogical and pgactive extensions must be disabled on the blue environment when you create a blue/green deployment. After you switch over the green environment to be the new production environment, you can enable the extensions again. In addition, the blue database can't be a logical subscriber of an external instance. If you're using the pgAudit extension, it must remain in the shared libraries (shared_preload_libraries) on the custom DB parameter groups for both the blue and the green DB instances.\"" \
+        execute_check_all_dbs \
+            "Blue/Green Extension Compatibility Check - what to check: \"The following limitations apply to PostgreSQL extensions:<ul style='padding-left: 2em'><li>The pg_partman extension must be disabled in the blue environment when you create a blue/green deployment. The extension performs DDL operations such as CREATE TABLE, which break logical replication from the blue environment to the green environment.</li><li>The pg_cron extension must remain disabled on all green databases after the blue/green deployment is created. The extension has background workers that run as superuser and bypass the read-only setting of the green environment, which might cause replication conflicts.</li><li>The pglogical and pgactive extensions must be disabled on the blue environment when you create a blue/green deployment. After you switch over the green environment to be the new production environment, you can enable the extensions again. In addition, the blue database can't be a logical subscriber of an external instance.</li><li>If you're using the pgAudit extension, it must remain in the shared libraries (shared_preload_libraries) on the custom DB parameter groups for both the blue and the green DB instances.</li></ul>\"" \
             "Check for extensions with blue/green deployment limitations" \
             "SELECT 
                 e.extname AS extension_name,
@@ -5934,21 +5812,12 @@ Details: ${upgrade_targets}"
                     ELSE 2
                 END;
             
-            -- Check shared_preload_libraries for pgaudit
-            SELECT 
-                name,
-                setting,
-                CASE 
-                    WHEN setting LIKE '%pgaudit%' THEN 'WARNING - pgaudit is in shared_preload_libraries'
-                    ELSE 'INFO - pgaudit not found in shared_preload_libraries'
-                END AS issue
-            FROM pg_settings
-            WHERE name = 'shared_preload_libraries';" \
+" \
             "${output_file}" \
             "34"
         
         # Check 35: DDL Event Triggers Check
-        execute_check \
+        execute_check_all_dbs \
             "DDL Event Triggers Check - what to check: \"DDL event triggers (ddl_command_start, ddl_command_end, sql_drop) may interfere with Blue/Green deployment. They can be triggered during CREATE SUBSCRIPTION on the green instance. Consider disabling them before creating the Blue/Green deployment.\"" \
             "Check for DDL event triggers that may interfere with Blue/Green deployment" \
             "SELECT
@@ -5970,7 +5839,7 @@ Details: ${upgrade_targets}"
             "35"
         
         # Check 35b: DTS Trigger Check
-        execute_check \
+        execute_check_all_dbs \
             "DTS Trigger Check - what to check: \"The DTS trigger 'dts_capture_catalog_start' will cause Blue/Green deployment to fail. Drop this trigger before creating the Blue/Green deployment.\"" \
             "Check for DTS trigger that causes Blue/Green deployment failure" \
             "SELECT
