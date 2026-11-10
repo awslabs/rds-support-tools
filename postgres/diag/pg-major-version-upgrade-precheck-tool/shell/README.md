@@ -113,14 +113,14 @@ In interactive mode, the script prompts you to choose the format.
 ## Environment Variables
 
 ```bash
-export RUN_MODE="sql"
-export DB_HOST="mydb.rds.amazonaws.com"
-export DB_PORT="5432"
-export DB_NAME="postgres"
-export DB_USER="admin"
-export DB_PASS="mypassword"
+export RUN_MODE_ENV="sql"
+export DB_HOST_ENV="mydb.rds.amazonaws.com"
+export DB_PORT_ENV="5432"
+export DB_NAME_ENV="postgres"
+export DB_USER_ENV="admin"
+export DB_PASS_ENV="mypassword"
 export TARGET_VERSION_ENV="18"
-export REPORT_FORMAT="text"
+export REPORT_FORMAT_ENV="text"
 export BLUE_GREEN_MODE="true"
 
 ./pg-major-version-upgrade-precheck.sh --non-interactive
