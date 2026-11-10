@@ -895,7 +895,7 @@ test_connection() {
     echo "Testing database connection..."
     
     local test_output
-    test_output=$(PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -c "SELECT 1;" 2>&1)
+    test_output=$(PGPASSWORD="${DB_PASS}" psql -X -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -c "SELECT 1;" 2>&1)
     local test_exit_code=$?
     
     if [ $test_exit_code -eq 0 ]; then
@@ -1903,7 +1903,7 @@ get_all_databases() {
     local psql_err
     psql_err=$(mktemp)
     ALL_DATABASES=$(echo "SELECT datname FROM pg_database WHERE datistemplate = false AND datallowconn = true AND datname NOT IN ('rdsadmin') ORDER BY datname;" | \
-        PGPASSWORD="${DB_PASS}" psql -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -A 2>"${psql_err}")
+        PGPASSWORD="${DB_PASS}" psql -X -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -A 2>"${psql_err}")
     local _rc=$?
     if [ ${_rc} -ne 0 ]; then
         echo -e "${RED}ERROR: Failed to retrieve database list: $(cat "${psql_err}")${NC}" >&2
@@ -1954,7 +1954,7 @@ execute_check_all_dbs() {
         local db_result
         local psql_err
         psql_err=$(mktemp)
-        db_result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${db}" -t -A 2>"${psql_err}")
+        db_result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -X -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${db}" -t -A 2>"${psql_err}")
         local _rc=$?
 
         if [ ${_rc} -ne 0 ]; then
@@ -2040,9 +2040,9 @@ execute_max_locks_all_dbs() {
     local max_connections max_prepared current_max_locks
     local psql_err_params
     psql_err_params=$(mktemp)
-    max_connections=$(echo "SHOW max_connections;" | PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -A 2>"${psql_err_params}" | tr -d ' ')
-    max_prepared=$(echo "SHOW max_prepared_transactions;" | PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -A 2>>"${psql_err_params}" | tr -d ' ')
-    current_max_locks=$(echo "SHOW max_locks_per_transaction;" | PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -A 2>>"${psql_err_params}" | tr -d ' ')
+    max_connections=$(echo "SHOW max_connections;" | PGPASSWORD="${DB_PASS}" psql -X -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -A 2>"${psql_err_params}" | tr -d ' ')
+    max_prepared=$(echo "SHOW max_prepared_transactions;" | PGPASSWORD="${DB_PASS}" psql -X -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -A 2>>"${psql_err_params}" | tr -d ' ')
+    current_max_locks=$(echo "SHOW max_locks_per_transaction;" | PGPASSWORD="${DB_PASS}" psql -X -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -A 2>>"${psql_err_params}" | tr -d ' ')
     rm -f "${psql_err_params}"
 
     # Apply defaults and validate
@@ -2070,7 +2070,7 @@ execute_max_locks_all_dbs() {
         local psql_err_count
         psql_err_count=$(mktemp)
         count=$(echo "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema NOT IN ('pg_catalog','information_schema','pg_toast') AND table_type = 'BASE TABLE';" | \
-            PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${db}" -t -A 2>"${psql_err_count}" | tr -d ' ')
+            PGPASSWORD="${DB_PASS}" psql -X -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${db}" -t -A 2>"${psql_err_count}" | tr -d ' ')
         local _rc_count=$?
         if [ ${_rc_count} -ne 0 ] || ! [[ "${count}" =~ ^[0-9]+$ ]]; then
             db_breakdown="${db_breakdown}  ${db}: ERROR - could not query table count ($(cat "${psql_err_count}"))
@@ -2328,7 +2328,7 @@ detect_engine_type() {
 get_pg_major_version() {
     if [ -z "$PG_MAJOR_VERSION" ]; then
         local version_num
-        version_num=$(PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -A -c "SHOW server_version_num;" 2>/dev/null)
+        version_num=$(PGPASSWORD="${DB_PASS}" psql -X -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -A -c "SHOW server_version_num;" 2>/dev/null)
         if [ -n "$version_num" ]; then
             # Convert version number (e.g., 130012 -> 13, 150004 -> 15)
             PG_MAJOR_VERSION=$((version_num / 10000))
@@ -4296,7 +4296,7 @@ check_invalid_databases() {
     echo "Running: ${check_name}..."
     
     local result
-    result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" 2>&1)    
+    result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -X -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" 2>&1)    
     local rc=$?
     local status="SUCCESS"
     
@@ -4342,7 +4342,7 @@ check_database_age() {
     echo "Running: ${check_name}..."
     
     local result
-    result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" 2>&1)    
+    result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -X -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" 2>&1)    
     local rc=$?
     local status="SUCCESS"
     
@@ -4392,7 +4392,7 @@ execute_check() {
     # echo "FUNCTION ENTRY: execute_check called with check_id=${check_id}" >&2
     
     local result
-    result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" 2>&1)    
+    result=$(echo "${sql_query}" | PGPASSWORD="${DB_PASS}" psql -X -v ON_ERROR_STOP=1 -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" 2>&1)    
     local rc=$?
     local status="SUCCESS"
     
@@ -4847,7 +4847,7 @@ EOF
             
             # Create and populate baseline stats table
             local baseline_result
-            baseline_result=$(PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" <<'EOSQL' 2>&1
+            baseline_result=$(PGPASSWORD="${DB_PASS}" psql -X -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" <<'EOSQL' 2>&1
 -- Create baseline statistics table (run before upgrade)
 DROP TABLE IF EXISTS preupgrade_baseline_stats;
 CREATE TABLE preupgrade_baseline_stats (
@@ -5252,7 +5252,7 @@ EOF
             [ -z "$db" ] && continue
             local db_ext
             db_ext=$(echo "SELECT current_database() AS database_name, extname AS extension_name, extversion AS installed_version, a.default_version AS available_version, CASE WHEN a.default_version IS NULL THEN 'UNAVAILABLE' WHEN e.extversion <> a.default_version THEN 'UPDATE REQUIRED' ELSE 'OK' END AS status, nspname AS schema FROM pg_extension e LEFT JOIN pg_available_extensions a ON e.extname = a.name JOIN pg_namespace ON e.extnamespace = pg_namespace.oid WHERE nspname NOT IN ('pg_catalog','information_schema') ORDER BY CASE WHEN a.default_version IS NULL THEN 0 WHEN e.extversion <> a.default_version THEN 1 ELSE 2 END, extname;" | \
-                PGPASSWORD="${DB_PASS}" psql -v ON_ERROR_STOP=1 -t -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${db}" 2>&1)
+                PGPASSWORD="${DB_PASS}" psql -X -v ON_ERROR_STOP=1 -t -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${db}" 2>&1)
             if [ $? -ne 0 ]; then
                 ext_error=true
             fi
@@ -5412,7 +5412,7 @@ ${db_ext}
         # Check 22: Parameter Permissions Check (PostgreSQL 15+)
         # Get PostgreSQL version
         local pg_version
-        pg_version=$(PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -c "SHOW server_version;" 2>&1 | awk '{print $1}' | cut -d. -f1)        
+        pg_version=$(PGPASSWORD="${DB_PASS}" psql -X -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -c "SHOW server_version;" 2>&1 | awk '{print $1}' | cut -d. -f1)        
         if [ "$pg_version" -ge 15 ] 2>/dev/null; then
             execute_check \
                 "Parameter Permissions Check - what to check: \"Custom parameter permissions can cause upgrade failure\"" \
@@ -5506,7 +5506,7 @@ ${db_ext}
         # Check 24: Version Compatibility and Upgrade Path
         echo "Checking version compatibility and valid upgrade targets..."
         local current_version
-        current_version=$(PGPASSWORD="${DB_PASS}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -c "SHOW server_version;" 2>/dev/null | xargs | cut -d' ' -f1)        
+        current_version=$(PGPASSWORD="${DB_PASS}" psql -X -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" -t -c "SHOW server_version;" 2>/dev/null | xargs | cut -d' ' -f1)        
         local version_check_result=""
         local version_check_status="SUCCESS"
         
